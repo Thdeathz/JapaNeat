@@ -2,7 +2,8 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import { DefaultLayout } from './components/Layout'
-import { publicRoutes } from './router'
+import RequireAuth from './pages/Auth/RequireAuth'
+import { privateRoutes, publicRoutes } from './router'
 
 function App() {
   return (
@@ -25,6 +26,23 @@ function App() {
               />
             )
           })}
+          <Route element={<RequireAuth />}>
+            {privateRoutes.map((route, index) => {
+              const Page = route.component
+              const Layout = route.layout || DefaultLayout
+              return (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={
+                    <Layout>
+                      <Page />
+                    </Layout>
+                  }
+                />
+              )
+            })}
+          </Route>
         </Routes>
       </div>
     </Router>

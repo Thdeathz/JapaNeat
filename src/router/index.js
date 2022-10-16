@@ -1,13 +1,16 @@
 // Pages
-import { DemoPage } from '~/pages'
+import { Demo, Login, Home } from '~/pages'
 
 // Layout
-import { DefaultLayout } from '~/components/Layout'
+import { DefaultLayout, LoginLayout } from '~/components/Layout'
 
 // Public Page
-const publicRoutes = [{ path: '/demo', component: DemoPage, layout: DefaultLayout }]
+const publicRoutes = [{ path: '/login', component: Login, layout: LoginLayout }]
 
 // Private Page
-const privateRoutes = []
+const privateRoutes = [
+  { path: '/', component: Home, layout: DefaultLayout },
+  { path: '/demo', component: Demo, layout: DefaultLayout }
+]
 
 export { publicRoutes, privateRoutes }

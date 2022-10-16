@@ -1,1 +1,3 @@
-export { default as DemoPage } from './DemoPage'
+export { default as Demo } from './Demo'
+export { default as Login } from './Auth/Login'
+export { default as Home } from './Home'
