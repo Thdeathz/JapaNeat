@@ -13,7 +13,11 @@ export default function NavBar() {
           <Link to="/">JapaNeat</Link>
         </Typography>
         <Box className="flex flex-row justify-center items-center gap-16">
-          <Link className="text-xl font-medium text-default hover:text-textHover" underline="none">
+          <Link
+            to="/"
+            className="text-xl font-medium text-default hover:text-textHover"
+            underline="none"
+          >
             Home
           </Link>
           <Link className="text-xl font-medium text-default hover:text-textHover" underline="none">
