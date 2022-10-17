@@ -1,13 +1,16 @@
 import { Box, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material'
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
 import images from '~/assets/images'
 
 export default function VideoCard() {
+  const navigate = useNavigate()
+
   return (
     <Card sx={{ maxWidth: 280 }}>
-      <CardActionArea>
+      <CardActionArea onClick={() => navigate('/video')}>
         <CardMedia component="img" height="140" image={images.demoImage} alt="green iguana" />
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">

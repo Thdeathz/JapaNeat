@@ -5,7 +5,10 @@ module.exports = {
     extend: {
       colors: {
         default: '#272343',
-        textHover: '#3da9fc'
+        textHover: '#3da9fc',
+        cardBackground: '#272343',
+        cardHeadline: '#fffffe',
+        secondary: '#e3f6f5'
       },
       screens: {
         tablet: '640px',
