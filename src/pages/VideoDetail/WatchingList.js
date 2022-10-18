@@ -3,6 +3,7 @@ import { Avatar, Badge, Box, List, ListItem, Stack, Typography } from '@mui/mate
 import { styled } from '@mui/material/styles'
 import CameraIndoorIcon from '@mui/icons-material/CameraIndoor'
 import images from '~/assets/images'
+import { useNavigate } from 'react-router-dom'
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -24,13 +25,15 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }))
 
 export default function WatchingList() {
+  const navigate = useNavigate()
+
   return (
     <>
       <p className="text-center font-semibold text-2xl py-2 text-cardHeadline bg-cardBackground">
         Watching
       </p>
       <List component="div">
-        <ListItem button>
+        <ListItem button onClick={() => navigate('/room')}>
           <Stack
             className="w-full"
             direction="row"
@@ -48,7 +51,7 @@ export default function WatchingList() {
             <CameraIndoorIcon />
           </Stack>
         </ListItem>
-        <ListItem button>
+        <ListItem button onClick={() => navigate('/room')}>
           <Stack
             className="w-full"
             direction="row"
@@ -66,7 +69,7 @@ export default function WatchingList() {
             <CameraIndoorIcon />
           </Stack>
         </ListItem>
-        <ListItem button>
+        <ListItem button onClick={() => navigate('/room')}>
           <Stack
             className="w-full"
             direction="row"

@@ -1,5 +1,5 @@
 // Pages
-import { Demo, Login, Home, VideoDetail } from '~/pages'
+import { Demo, Login, Home, VideoDetail, RoomChat } from '~/pages'
 
 // Layout
 import { DefaultLayout, LoginLayout } from '~/components/Layout'
@@ -11,6 +11,7 @@ const publicRoutes = [{ path: '/login', component: Login, layout: LoginLayout }]
 const privateRoutes = [
   { path: '/', component: Home, layout: DefaultLayout },
   { path: '/video', component: VideoDetail, layout: DefaultLayout },
+  { path: '/room', component: RoomChat, layout: DefaultLayout },
   { path: '/demo', component: Demo, layout: DefaultLayout }
 ]
 

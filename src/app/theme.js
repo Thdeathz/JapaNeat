@@ -8,6 +8,9 @@ export const theme = createTheme({
     secondary: {
       main: '#90b4ce'
     },
+    secondaryBtn: {
+      main: '#3da9fc'
+    },
     textDefault: {
       main: '#094067'
     },
