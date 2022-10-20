@@ -10,7 +10,7 @@ const publicRoutes = [{ path: '/login', component: Login, layout: LoginLayout }]
 // Private Page
 const privateRoutes = [
   { path: '/', component: Home, layout: DefaultLayout },
-  { path: '/video', component: VideoDetail, layout: DefaultLayout },
+  { path: '/video/:videoId', component: VideoDetail, layout: DefaultLayout },
   { path: '/room', component: RoomChat, layout: DefaultLayout },
   { path: '/demo', component: Demo, layout: DefaultLayout }
 ]

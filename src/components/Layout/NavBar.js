@@ -1,11 +1,29 @@
 import React from 'react'
-import { AppBar, Badge, IconButton, Toolbar, Typography, Menu, MenuItem } from '@mui/material'
+import { AppBar, Badge, IconButton, Toolbar, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import AccountCircle from '@mui/icons-material/AccountCircle'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteFromWatchinglist, getCurrentVideoId } from '~/pages/VideoDetail/videosSlice'
+import { useGetCurrentUserQuery } from '~/pages/Auth/authApiSlice'
 
 export default function NavBar() {
+  const dispatch = useDispatch()
+  const videoId = useSelector(getCurrentVideoId)
+  const { data: userData } = useGetCurrentUserQuery()
+
+  const handleLiveVideoRoom = () => {
+    if (videoId) {
+      dispatch(
+        deleteFromWatchinglist({
+          videoId: videoId,
+          userData: userData
+        })
+      )
+    }
+  }
+
   return (
     <AppBar position="sticky">
       <Toolbar className="flex flex-row justify-between">
@@ -17,6 +35,7 @@ export default function NavBar() {
             to="/"
             className="text-xl font-medium text-default hover:text-textHover"
             underline="none"
+            onClick={handleLiveVideoRoom}
           >
             Home
           </Link>

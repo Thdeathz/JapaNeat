@@ -1,9 +1,16 @@
-import React from 'react'
-import { Avatar, Badge, Box, List, ListItem, Stack, Typography } from '@mui/material'
+import React, { useEffect, useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Avatar, Badge, Box, List, ListItem, Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import CameraIndoorIcon from '@mui/icons-material/CameraIndoor'
+import { addDocument, getDocument } from '~/firebase/services'
 import images from '~/assets/images'
-import { useNavigate } from 'react-router-dom'
+import { useGetCurrentUserQuery } from '../Auth/authApiSlice'
+import useFirestore from '~/hooks/useFirestore'
+import { addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
+import { db } from '~/firebase/config'
+import { useDispatch, useSelector } from 'react-redux'
+import { addCurrentVideoId, addToWatchinglist, getCurrentVideoId } from './videosSlice'
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -26,6 +33,32 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 export default function WatchingList() {
   const navigate = useNavigate()
+  const { videoId } = useParams()
+  const dispatch = useDispatch()
+  const currentVideoId = useSelector(getCurrentVideoId)
+  const userData = JSON.parse(localStorage.getItem('currentUser'))
+
+  const watchingList = useFirestore(`watchings/${videoId}/members`)
+
+  useEffect(() => {
+    const handleAddUserToWatchingList = async () => {
+      if (userData) {
+        const checkAdded = await getDocument({
+          collectionName: `watchings/${videoId}/members`
+        })
+        if (!checkAdded.find(user => user.id === userData.id) && !currentVideoId) {
+          dispatch(
+            addToWatchinglist({
+              videoId: videoId,
+              userData: userData
+            })
+          )
+        }
+      }
+    }
+
+    return handleAddUserToWatchingList
+  }, [userData, videoId])
 
   return (
     <>
@@ -33,60 +66,30 @@ export default function WatchingList() {
         Watching
       </p>
       <List component="div">
-        <ListItem button onClick={() => navigate('/room')}>
-          <Stack
-            className="w-full"
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <StyledBadge
-              overlap="circular"
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              variant="dot"
-            >
-              <Avatar alt="avatar image" src={images.demoImage} />
-            </StyledBadge>
-            <h4 className="ml-4 text-xl text-default">Thdeathz</h4>
-            <CameraIndoorIcon />
-          </Stack>
-        </ListItem>
-        <ListItem button onClick={() => navigate('/room')}>
-          <Stack
-            className="w-full"
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <StyledBadge
-              overlap="circular"
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              variant="dot"
-            >
-              <Avatar alt="avatar image" src={images.demoImage} />
-            </StyledBadge>
-            <h4 className="ml-4 text-xl text-default">Thdeathz</h4>
-            <CameraIndoorIcon />
-          </Stack>
-        </ListItem>
-        <ListItem button onClick={() => navigate('/room')}>
-          <Stack
-            className="w-full"
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <StyledBadge
-              overlap="circular"
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              variant="dot"
-            >
-              <Avatar alt="avatar image" src={images.demoImage} />
-            </StyledBadge>
-            <h4 className="ml-4 text-xl text-default">Thdeathz</h4>
-            <CameraIndoorIcon />
-          </Stack>
-        </ListItem>
+        {watchingList ? (
+          watchingList.map(user => (
+            <ListItem key={user.id} button onClick={() => navigate('/room')}>
+              <Stack
+                className="w-full"
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <StyledBadge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  variant="dot"
+                >
+                  <Avatar alt="avatar image" src={images.demoImage} />
+                </StyledBadge>
+                <h4 className="ml-4 text-xl text-default">{user?.userName}</h4>
+                <CameraIndoorIcon />
+              </Stack>
+            </ListItem>
+          ))
+        ) : (
+          <p>Get watching list</p>
+        )}
       </List>
     </>
   )
