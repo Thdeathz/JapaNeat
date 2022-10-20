@@ -3,10 +3,15 @@ import { useParams } from 'react-router-dom'
 import { Box, Button } from '@mui/material'
 import CameraAltIcon from '@mui/icons-material/CameraAlt'
 import EmergencyRecordingIcon from '@mui/icons-material/EmergencyRecording'
-import images from '~/assets/images'
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
+import CircularProgress from '@mui/material/CircularProgress'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
 import servers from '~/app/servers'
 import { addDoc, collection, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
 import { db } from '~/firebase/config'
+import { ReactMediaRecorder } from 'react-media-recorder'
+import uploadFile from '~/hooks/uploadFile'
+import { v4 } from 'uuid'
 
 const pc = new RTCPeerConnection(servers)
 
@@ -16,6 +21,7 @@ export default function VideoCall() {
   const remoteRef = useRef(null)
 
   const [webcamActive, setWebcamActive] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleOpenCamera = async () => {
     const localStream = await navigator.mediaDevices.getUserMedia({
@@ -105,24 +111,95 @@ export default function VideoCall() {
     }
   }
 
+  const handleUpload = async mediaBlobUrl => {
+    setLoading(true)
+    const blob = await fetch(mediaBlobUrl).then(r => r.blob())
+    if (blob) {
+      const file = new File([blob], String(v4()), { type: 'audio/wav' })
+      if (file) {
+        const path = await uploadFile(file)
+        if (path) {
+          console.log(path)
+          setLoading(false)
+        }
+      }
+    }
+  }
+
   return (
     <Box className="h-full flex flex-col gap-4">
-      <Box className="basis-3/4 flex flex-col gap-4 items-center ">
-        <video className="basis-1/2 object-cover" ref={localRef} autoPlay playsInline muted />
-        <video className="basis-1/2 object-cover" ref={remoteRef} autoPlay playsInline />
+      <Box className="basis-3/4 flex flex-col gap-4 items-center">
+        <video
+          className="basis-1/2 object-cover bg-slate-800"
+          ref={localRef}
+          autoPlay
+          playsInline
+          muted
+        />
+        <video
+          className="basis-1/2 object-cover bg-slate-800"
+          ref={remoteRef}
+          autoPlay
+          playsInline
+        />
       </Box>
       <Box className="flex flex-col gap-4">
-        <Button
-          fullWidth
-          variant="contained"
-          startIcon={<CameraAltIcon />}
-          onClick={handleOpenCamera}
-        >
-          Open Camera
-        </Button>
-        <Button fullWidth variant="contained" startIcon={<EmergencyRecordingIcon />}>
-          Start Recording
-        </Button>
+        {!webcamActive ? (
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={<CameraAltIcon />}
+            onClick={handleOpenCamera}
+          >
+            Open Camera
+          </Button>
+        ) : type === 'offer' ? (
+          <ReactMediaRecorder
+            screen
+            render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
+              <>
+                {status === 'idle' && (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<EmergencyRecordingIcon />}
+                    onClick={startRecording}
+                  >
+                    Start Recording
+                  </Button>
+                )}
+                {status === 'recording' && (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<RadioButtonCheckedIcon />}
+                    onClick={stopRecording}
+                  >
+                    Stop Recording
+                  </Button>
+                )}
+                {status === 'stopped' && (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={
+                      loading ? (
+                        <CircularProgress color="textDefault" size={14} />
+                      ) : (
+                        <UploadFileIcon />
+                      )
+                    }
+                    onClick={() => handleUpload(mediaBlobUrl)}
+                  >
+                    Upload Record
+                  </Button>
+                )}
+              </>
+            )}
+          />
+        ) : (
+          <Box></Box>
+        )}
       </Box>
     </Box>
   )
