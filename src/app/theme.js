@@ -8,8 +8,11 @@ export const theme = createTheme({
     secondary: {
       main: '#90b4ce'
     },
-    secondaryBtn: {
+    primaryBtn: {
       main: '#3da9fc'
+    },
+    secondaryBtn: {
+      main: '#ffd803'
     },
     textDefault: {
       main: '#094067'

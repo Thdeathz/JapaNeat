@@ -11,7 +11,7 @@ const publicRoutes = [{ path: '/login', component: Login, layout: LoginLayout }]
 const privateRoutes = [
   { path: '/', component: Home, layout: DefaultLayout },
   { path: '/video/:videoId', component: VideoDetail, layout: DefaultLayout },
-  { path: '/room', component: RoomChat, layout: DefaultLayout },
+  { path: '/room/:type/:roomId', component: RoomChat, layout: DefaultLayout },
   { path: '/demo', component: Demo, layout: DefaultLayout }
 ]
 

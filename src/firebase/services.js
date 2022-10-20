@@ -4,10 +4,11 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
   getDocs,
+  query,
   setDoc,
-  updateDoc
+  updateDoc,
+  where
 } from 'firebase/firestore'
 
 export const addDocument = async document => {
@@ -21,10 +22,13 @@ export const addDocument = async document => {
   return res?._key.path.segments[1]
 }
 
-export const getDocument = async document => {
+export const getDocument = async (document, condition) => {
   let ref = collection(db, document.collectionName)
   if (document.id) {
     ref = doc(ref, document.id)
+  }
+  if (condition) {
+    ref = query(ref, where(condition.fieldName, condition.operator, condition.compareValue))
   }
   const res = await getDocs(ref)
   if (res) {
@@ -44,4 +48,12 @@ export const deleteDocument = async document => {
   } else {
     res = await deleteDoc(collectionRef)
   }
+}
+
+export const updateDocument = async document => {
+  let collectionRef = collection(db, document.collectionName)
+  if (document.id) {
+    collectionRef = doc(collectionRef, document.id)
+  }
+  await updateDoc(collectionRef, document.data)
 }
