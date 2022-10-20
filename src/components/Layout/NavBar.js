@@ -3,22 +3,21 @@ import { AppBar, Badge, IconButton, Toolbar, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import AccountCircle from '@mui/icons-material/AccountCircle'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteFromWatchinglist, getCurrentVideoId } from '~/pages/VideoDetail/videosSlice'
-import { useGetCurrentUserQuery } from '~/pages/Auth/authApiSlice'
 
 export default function NavBar() {
   const dispatch = useDispatch()
   const videoId = useSelector(getCurrentVideoId)
-  const { data: userData } = useGetCurrentUserQuery()
+  const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
 
   const handleLiveVideoRoom = () => {
     if (videoId) {
       dispatch(
         deleteFromWatchinglist({
           videoId: videoId,
-          userData: userData
+          userData: currentUserData
         })
       )
     }

@@ -6,15 +6,19 @@ import images from '~/assets/images'
 
 export default function VideoCall() {
   return (
-    <Box className="flex flex-col gap-4">
-      <img className="h-full" src={images.demoImage} alt="Video" />
-      <img className="h-full" src={images.demoImage} alt="Video" />
-      <Button variant="contained" startIcon={<CameraAltIcon />}>
-        Open Camera
-      </Button>
-      <Button variant="contained" startIcon={<EmergencyRecordingIcon />}>
-        Start Recording
-      </Button>
+    <Box className="h-full flex flex-col gap-4">
+      <Box className="basis-3/4 flex flex-col gap-4 items-center ">
+        <img className="basis-1/2 object-cover" src={images.demoImage} alt="Video" />
+        <img className="basis-1/2 object-cover" src={images.demoImage} alt="Video" />
+      </Box>
+      <Box className="flex flex-col gap-4">
+        <Button fullWidth variant="contained" startIcon={<CameraAltIcon />}>
+          Open Camera
+        </Button>
+        <Button fullWidth variant="contained" startIcon={<EmergencyRecordingIcon />}>
+          Start Recording
+        </Button>
+      </Box>
     </Box>
   )
 }
