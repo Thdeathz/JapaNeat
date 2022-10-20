@@ -9,7 +9,7 @@ export default function VideoDetail() {
     <>
       <Box className="flex justify-center">
         <Stack
-          className="py-2 max-h-[500px] desktop:w-[1200px]"
+          className="py-2 h-[80vh] desktop:w-[90vw]"
           direction="row"
           spacing={4}
           justifyContent="center"
@@ -24,7 +24,7 @@ export default function VideoDetail() {
       </Box>
       <Box className="flex justify-center">
         <Stack
-          className="py-2 desktop:w-[1200px]"
+          className="py-2 desktop:w-[90vw]"
           direction="row"
           spacing={4}
           justifyContent="center"

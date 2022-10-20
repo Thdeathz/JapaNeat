@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom'
 import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
 import images from '~/assets/images'
+import { PropTypes } from 'prop-types'
 
-export default function VideoCard() {
+function VideoCard({ videoId }) {
   const navigate = useNavigate()
 
   return (
     <Card sx={{ maxWidth: 280 }}>
-      <CardActionArea onClick={() => navigate('/video')}>
+      <CardActionArea onClick={() => navigate(`/video/${videoId}`)}>
         <CardMedia component="img" height="140" image={images.demoImage} alt="green iguana" />
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
@@ -42,3 +43,9 @@ export default function VideoCard() {
     </Card>
   )
 }
+
+VideoCard.propTypes = {
+  videoId: PropTypes.number
+}
+
+export default VideoCard
