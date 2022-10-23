@@ -1,24 +1,27 @@
 import { Box } from '@mui/material'
 import React from 'react'
-import images from '~/assets/images'
+import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
+import { selectVideoById } from '../VideoDetail/videosSlice'
 
 export default function VideoControl() {
+  const { videoId } = useParams()
+
+  const video = useSelector(state => selectVideoById(state, Number(videoId)))
+
   return (
     <Box className="h-full flex flex-col gap-4">
       <Box className="basis-3/4 bg-slate-900">
-        <img className="h-full object-cover" src={images.demoImage} alt="Video" />
+        <video className="hover:cursor-pointer w-full h-full" controls>
+          <source src={video.video.url} type="video/mp4" />
+        </video>
       </Box>
       <Box className="h-full" flex={8} color="secondary">
         <Box className="flex justify-between items-center">
-          <h1 className="font-bold text-default text-4xl">Video Tile</h1>
-          <h1 className="text-xl">Category</h1>
+          <h1 className="font-bold text-default text-4xl">{video.title}</h1>
+          <h1 className="text-xl">{video.category}</h1>
         </Box>
-        <p className="mt-2 text-default text-base">
-          My goal with Happy Hues was to try to remove the issue where you know you like a color
-          palette, but you are unsure about how to apply it to your design or illustration. I built
-          this site to not only give you color inspiration, but also give you an example as to how
-          and where you could use the colors.
-        </p>
+        <p className="mt-2 text-default text-base">{video.description}</p>
       </Box>
     </Box>
   )

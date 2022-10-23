@@ -6,10 +6,12 @@ import AccountCircle from '@mui/icons-material/AccountCircle'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteFromWatchinglist, getCurrentVideoId } from '~/pages/VideoDetail/videosSlice'
+import { deleteRoomChat, getCurrentRoomId } from '~/pages/RoomChat/roomChatSlice'
 
 export default function NavBar() {
   const dispatch = useDispatch()
   const videoId = useSelector(getCurrentVideoId)
+  const roomId = useSelector(getCurrentRoomId)
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
 
   const handleLiveVideoRoom = () => {
@@ -18,6 +20,14 @@ export default function NavBar() {
         deleteFromWatchinglist({
           videoId: videoId,
           userData: currentUserData
+        })
+      )
+    }
+    if (roomId) {
+      dispatch(
+        deleteRoomChat({
+          videoId: videoId,
+          roomId: roomId
         })
       )
     }

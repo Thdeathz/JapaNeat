@@ -1,9 +1,32 @@
-import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit'
+import {
+  createSlice,
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector
+} from '@reduxjs/toolkit'
+import { apiSlice } from '~/api/apiSlice'
 import { addDocument, deleteDocument } from '~/firebase/services'
 
-const initialState = {
+const videosAdapter = createEntityAdapter({})
+
+const initialState = videosAdapter.getInitialState({
   currentVideoId: null
-}
+})
+
+export const videosApiSlice = apiSlice.injectEndpoints({
+  endpoints: builder => ({
+    getVideos: builder.query({
+      query: () => '/video_details',
+      transformResponse: res => {
+        return videosAdapter.setAll(initialState, res.data)
+      },
+      providesTags: (result, error, arg) => [
+        { type: 'Video', id: 'List' },
+        ...result.ids.map(id => ({ type: 'Video', id }))
+      ]
+    })
+  })
+})
 
 export const addToWatchinglist = createAsyncThunk('videos/addWatchinglist', async initialState => {
   try {
@@ -48,6 +71,18 @@ const videosSlice = createSlice({
       })
   }
 })
+
+export const { useGetVideosQuery } = videosApiSlice
+
+export const selectVideoResult = videosApiSlice.endpoints.getVideos.select()
+
+const selectVideosData = createSelector(selectVideoResult, videosResult => videosResult.data)
+
+export const {
+  selectAll: selectAllVideos,
+  selectById: selectVideoById,
+  selectIds: selectVideoIds
+} = videosAdapter.getSelectors(state => selectVideosData(state) ?? initialState)
 
 export const { addCurrentVideoId } = videosSlice.actions
 

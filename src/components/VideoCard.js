@@ -5,25 +5,28 @@ import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
 import images from '~/assets/images'
 import { PropTypes } from 'prop-types'
+import { useSelector } from 'react-redux'
+import { selectVideoById } from '~/pages/VideoDetail/videosSlice'
 
 function VideoCard({ videoId }) {
   const navigate = useNavigate()
+  const video = useSelector(state => selectVideoById(state, videoId))
 
   return (
     <Card sx={{ maxWidth: 280 }}>
       <CardActionArea onClick={() => navigate(`/video/${videoId}`)}>
-        <CardMedia component="img" height="140" image={images.demoImage} alt="green iguana" />
+        <CardMedia component="img" height="140" image={video.video.thumbnail} alt="green iguana" />
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
             <Typography variant="h5" component="p">
-              Video title
+              {video.title}
             </Typography>
             <Typography component="p">23m views</Typography>
           </Box>
           <Box className="flex flex-row justify-between items-center border-t-2 py-2 px-1">
             <Box>
               <Typography gutterBottom component="p">
-                Category
+                {video.category}
               </Typography>
               <Typography component="p">
                 <PersonIcon /> 23 watching
