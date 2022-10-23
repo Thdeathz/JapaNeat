@@ -22,7 +22,7 @@ import { v4 } from 'uuid'
 import images from '~/assets/images'
 import { getDocument } from '~/firebase/services'
 import useFirestore from '~/hooks/useFirestore'
-import { addToWatchinglist, getCurrentVideoId } from './videosSlice'
+import { addToWatchinglist, deleteFromWatchinglist, getCurrentVideoId } from './videosSlice'
 import { changeRoomStatus, sendOffer } from '../RoomChat/roomChatSlice'
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -91,6 +91,12 @@ export default function WatchingList() {
       changeRoomStatus({
         roomId: roomData.id,
         videoId: roomData.videoId
+      })
+    )
+    dispatch(
+      deleteFromWatchinglist({
+        videoId: videoId,
+        userData: currentUserData
       })
     )
     navigate(`/room/${videoId}/${roomData.roomId}/answer`)

@@ -2,13 +2,23 @@ import { Box, Card, CardActionArea, CardContent, CardMedia, Typography } from '@
 import React from 'react'
 import PersonIcon from '@mui/icons-material/Person'
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer'
+import { PropTypes } from 'prop-types'
 import images from '~/assets/images'
+import { useSelector } from 'react-redux'
+import { selectRecordById } from '~/pages/RecordDetail/recordsSlice'
 
-export default function RecordCard() {
+function RecordCard({ recordId }) {
+  const record = useSelector(state => selectRecordById(state, Number(recordId)))
+
   return (
     <Card sx={{ maxWidth: 280 }}>
       <CardActionArea>
-        <CardMedia component="img" height="140" image={images.demoImage} alt="green iguana" />
+        <CardMedia
+          component="img"
+          height="140"
+          image={record.record.thumbnail}
+          alt="green iguana"
+        />
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
             <Typography variant="h5" component="p">
@@ -22,7 +32,7 @@ export default function RecordCard() {
                 Category
               </Typography>
               <Typography component="p">
-                <PersonIcon /> Thdeathz
+                <PersonIcon /> {record.offer}
               </Typography>
             </Box>
             <Box className="text-right">
@@ -39,3 +49,9 @@ export default function RecordCard() {
     </Card>
   )
 }
+
+RecordCard.propTypes = {
+  recordId: PropTypes.number
+}
+
+export default RecordCard

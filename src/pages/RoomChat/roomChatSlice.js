@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { addDocument, deleteDocument, updateDocument } from '~/firebase/services'
 
 const initialState = {
+  roomData: null,
   currentRoomId: null
 }
 

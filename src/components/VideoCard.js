@@ -3,19 +3,18 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
-import images from '~/assets/images'
 import { PropTypes } from 'prop-types'
 import { useSelector } from 'react-redux'
 import { selectVideoById } from '~/pages/VideoDetail/videosSlice'
 
 function VideoCard({ videoId }) {
   const navigate = useNavigate()
-  const video = useSelector(state => selectVideoById(state, videoId))
+  const video = useSelector(state => selectVideoById(state, Number(videoId)))
 
   return (
     <Card sx={{ maxWidth: 280 }}>
       <CardActionArea onClick={() => navigate(`/video/${videoId}`)}>
-        <CardMedia component="img" height="140" image={video.video.thumbnail} alt="green iguana" />
+        <CardMedia component="img" height="140" image={video.video.thumbnail} alt="video" />
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
             <Typography variant="h5" component="p">
