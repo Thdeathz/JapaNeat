@@ -11,14 +11,11 @@ function RecordCard({ recordId }) {
   const record = useSelector(state => selectRecordById(state, Number(recordId)))
 
   return (
-    <Card sx={{ maxWidth: 280 }}>
+    <Card className="h-full max-w-[280px]">
       <CardActionArea>
-        <CardMedia
-          component="img"
-          height="140"
-          image={record.record.thumbnail}
-          alt="green iguana"
-        />
+        <Box className="min-w-[280px] h-full bg-secondary flex justify-center">
+          <img className="h-[200px] object-contain" src={record.record.thumbnail} alt="video" />
+        </Box>
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
             <Typography variant="h5" component="p">

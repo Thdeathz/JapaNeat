@@ -14,7 +14,9 @@ function VideoCard({ videoId }) {
   return (
     <Card sx={{ maxWidth: 280 }}>
       <CardActionArea onClick={() => navigate(`/video/${videoId}`)}>
-        <CardMedia component="img" height="140" image={video.video.thumbnail} alt="video" />
+        <Box className="min-w-[280px] bg-secondary flex justify-center">
+          <img className="h-[200px] object-contain" src={video.video.thumbnail} alt="video" />
+        </Box>
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
             <Typography variant="h5" component="p">
