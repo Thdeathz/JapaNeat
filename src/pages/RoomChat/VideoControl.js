@@ -1,14 +1,8 @@
-import { Box } from '@mui/material'
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { selectVideoById } from '../VideoDetail/videosSlice'
+import { Box } from '@mui/material'
+import { PropTypes } from 'prop-types'
 
-export default function VideoControl() {
-  const { videoId } = useParams()
-
-  const video = useSelector(state => selectVideoById(state, Number(videoId)))
-
+function VideoControl({ video }) {
   return (
     <Box className="h-full flex flex-col gap-4">
       <Box className="basis-3/4 bg-slate-900">
@@ -26,3 +20,9 @@ export default function VideoControl() {
     </Box>
   )
 }
+
+VideoControl.propTypes = {
+  video: PropTypes.object
+}
+
+export default VideoControl

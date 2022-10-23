@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Box, Button } from '@mui/material'
 import CameraAltIcon from '@mui/icons-material/CameraAlt'
 import EmergencyRecordingIcon from '@mui/icons-material/EmergencyRecording'
@@ -12,16 +12,30 @@ import { db } from '~/firebase/config'
 import { ReactMediaRecorder } from 'react-media-recorder'
 import uploadFile from '~/hooks/uploadFile'
 import { v4 } from 'uuid'
+import { useAddNewRecordMutation } from '../RecordDetail/recordsSlice'
+import { PropTypes } from 'prop-types'
+import { useDispatch } from 'react-redux'
+import { deleteRoomChat } from './roomChatSlice'
 
 const pc = new RTCPeerConnection(servers)
 
-export default function VideoCall() {
+function VideoCall({ video }) {
   const { type, roomId, videoId } = useParams()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
   const localRef = useRef(null)
   const remoteRef = useRef(null)
 
   const [webcamActive, setWebcamActive] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const [addNewRecord] = useAddNewRecordMutation()
+
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+
+  const room = doc(db, `watchings/${videoId}/rooms`, String(roomId))
+  const offerCandidates = collection(room, 'offerCandidates')
+  const answerCandidates = collection(room, 'answerCandidates')
 
   const handleOpenCamera = async () => {
     const localStream = await navigator.mediaDevices.getUserMedia({
@@ -45,10 +59,6 @@ export default function VideoCall() {
     remoteRef.current.srcObject = remoteStream
 
     setWebcamActive(true)
-
-    const room = doc(db, `watchings/${videoId}/rooms`, String(roomId))
-    const offerCandidates = collection(room, 'offerCandidates')
-    const answerCandidates = collection(room, 'answerCandidates')
 
     if (type === 'offer') {
       pc.onicecandidate = event => {
@@ -118,9 +128,27 @@ export default function VideoCall() {
       const file = new File([blob], String(v4()), { type: 'audio/wav' })
       if (file) {
         const path = await uploadFile(file)
+        const roomInf = (await getDoc(room)).data()
         if (path) {
-          console.log(path)
-          setLoading(false)
+          try {
+            await addNewRecord({
+              url: path,
+              thumbnail: video.video.thumbnail,
+              offer_id: roomInf.offerId,
+              answer_id: roomInf.answerId,
+              video_detail_id: video.id
+            }).unwrap()
+            dispatch(
+              deleteRoomChat({
+                videoId: videoId,
+                roomId: roomId
+              })
+            )
+            navigate('/')
+            setLoading(false)
+          } catch (error) {
+            console.log(error)
+          }
         }
       }
     }
@@ -204,3 +232,9 @@ export default function VideoCall() {
     </Box>
   )
 }
+
+VideoCall.propTypes = {
+  video: PropTypes.object
+}
+
+export default VideoCall

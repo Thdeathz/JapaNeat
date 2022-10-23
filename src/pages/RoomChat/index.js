@@ -3,11 +3,16 @@ import React from 'react'
 import ChatBox from './ChatBox'
 import VideoControl from './VideoControl'
 import VideoCall from './VideoCall'
-import { useGetVideosQuery } from '../VideoDetail/videosSlice'
+import { selectVideoById, useGetVideosQuery } from '../VideoDetail/videosSlice'
 import { Loading } from '~/components/Layout'
+import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 export default function RoomChat() {
+  const { videoId } = useParams()
   const { isLoading } = useGetVideosQuery()
+
+  const video = useSelector(state => selectVideoById(state, videoId))
 
   return (
     <>
@@ -22,10 +27,10 @@ export default function RoomChat() {
             justifyContent="center"
           >
             <Box className="h-full" flex={9} color="secondary">
-              <VideoControl />
+              <VideoControl video={video} />
             </Box>
             <Box className="h-full" flex={3} color="secondary">
-              <VideoCall />
+              <VideoCall video={video} />
             </Box>
             <Box className="bg-secondary h-full" flex={4}>
               <ChatBox />
