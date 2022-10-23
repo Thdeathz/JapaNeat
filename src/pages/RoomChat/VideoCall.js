@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Box, Button } from '@mui/material'
 import CameraAltIcon from '@mui/icons-material/CameraAlt'
 import EmergencyRecordingIcon from '@mui/icons-material/EmergencyRecording'
@@ -16,26 +16,24 @@ import { useAddNewRecordMutation } from '../RecordDetail/recordsSlice'
 import { PropTypes } from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { deleteRoomChat } from './roomChatSlice'
+import { toast } from 'react-toastify'
 
 const pc = new RTCPeerConnection(servers)
 
 function VideoCall({ video }) {
-  const { type, roomId, videoId } = useParams()
+  const { roomId, videoId } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const localRef = useRef(null)
   const remoteRef = useRef(null)
 
+  const [roomData, setRoomData] = useState(null)
   const [webcamActive, setWebcamActive] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const [addNewRecord] = useAddNewRecordMutation()
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser'))
-
-  const room = doc(db, `watchings/${videoId}/rooms`, String(roomId))
-  const offerCandidates = collection(room, 'offerCandidates')
-  const answerCandidates = collection(room, 'answerCandidates')
 
   const handleOpenCamera = async () => {
     const localStream = await navigator.mediaDevices.getUserMedia({
@@ -60,7 +58,13 @@ function VideoCall({ video }) {
 
     setWebcamActive(true)
 
-    if (type === 'offer') {
+    const room = doc(db, `watchings/${videoId}/rooms`, String(roomId))
+    const offerCandidates = collection(room, 'offerCandidates')
+    const answerCandidates = collection(room, 'answerCandidates')
+
+    const callData = (await getDoc(room)).data()
+
+    if (callData.offerId === currentUser.id) {
       pc.onicecandidate = event => {
         event.candidate && addDoc(offerCandidates, event.candidate.toJSON())
       }
@@ -90,12 +94,10 @@ function VideoCall({ video }) {
           }
         })
       })
-    } else if (type === 'answer') {
+    } else if (callData.answerId === currentUser.id) {
       pc.onicecandidate = event => {
         event.candidate && addDoc(answerCandidates, event.candidate.toJSON())
       }
-
-      const callData = (await getDoc(room)).data()
 
       const offerDescription = callData.offer
       await pc.setRemoteDescription(new RTCSessionDescription(offerDescription))
@@ -116,6 +118,20 @@ function VideoCall({ video }) {
             let data = change.doc.data()
             pc.addIceCandidate(new RTCIceCandidate(data))
           }
+          pc.onconnectionstatechange = event => {
+            if (pc.connectionState === 'disconnected') {
+              pc.close()
+              localStream.getTracks().forEach(track => {
+                if (track.readyState === 'live') {
+                  track.stop()
+                }
+              })
+              toast.info('Your Kaiwa session is over', {
+                toastId: 1
+              })
+              navigate('/')
+            }
+          }
         })
       })
     }
@@ -128,16 +144,16 @@ function VideoCall({ video }) {
       const file = new File([blob], String(v4()), { type: 'audio/wav' })
       if (file) {
         const path = await uploadFile(file)
-        const roomInf = (await getDoc(room)).data()
         if (path) {
           try {
             await addNewRecord({
               url: path,
               thumbnail: video.video.thumbnail,
-              offer_id: roomInf.offerId,
-              answer_id: roomInf.answerId,
+              offer_id: roomData.offerId,
+              answer_id: roomData.answerId,
               video_detail_id: video.id
             }).unwrap()
+            pc.close()
             dispatch(
               deleteRoomChat({
                 videoId: videoId,
@@ -153,6 +169,16 @@ function VideoCall({ video }) {
       }
     }
   }
+
+  useEffect(() => {
+    const fetchRoomData = () => {
+      onSnapshot(doc(db, `watchings/${videoId}/rooms`, String(roomId)), snapshot =>
+        setRoomData({ ...snapshot.data() })
+      )
+    }
+
+    return fetchRoomData
+  }, [videoId, roomId])
 
   return (
     <Box className="h-full flex flex-col gap-4">
@@ -181,7 +207,7 @@ function VideoCall({ video }) {
           >
             Open Camera
           </Button>
-        ) : type === 'offer' ? (
+        ) : roomData.offerId === currentUser.id ? (
           <ReactMediaRecorder
             screen
             render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (

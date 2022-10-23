@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify'
 import { DefaultLayout } from './components/Layout'
 import RequireAuth from './pages/Auth/RequireAuth'
 import { privateRoutes, publicRoutes } from './router'
+import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
   return (

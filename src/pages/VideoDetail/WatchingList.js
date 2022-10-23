@@ -99,7 +99,7 @@ export default function WatchingList() {
         userData: currentUserData
       })
     )
-    navigate(`/room/${videoId}/${roomData.roomId}/answer`)
+    navigate(`/room/${videoId}/${roomData.roomId}`)
   }
 
   useEffect(() => {
@@ -126,7 +126,7 @@ export default function WatchingList() {
     const handleOfferNavigate = () => {
       const room = offerList.find(room => room.offerId === currentUserData.id)
       if (room?.status === 'accepted') {
-        navigate(`/room/${videoId}/${room.roomId}/offer`)
+        navigate(`/room/${videoId}/${room.roomId}`)
       }
     }
 
