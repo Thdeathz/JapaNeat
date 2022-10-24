@@ -19,7 +19,6 @@ export const addDocument = async document => {
   } else {
     res = await addDoc(collectionRef, document.data)
   }
-  return res?._key.path.segments[1]
 }
 
 export const getDocument = async (document, condition) => {

@@ -1,4 +1,4 @@
-import { collection, onSnapshot } from 'firebase/firestore'
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import { db } from '~/firebase/config'
 
@@ -17,6 +17,8 @@ const useFirestore = (collectionName, condition) => {
         collectionRef,
         where(condition.fieldName, condition.operator, condition.compareValue)
       )
+    } else {
+      collectionRef = query(collectionRef, orderBy('createdAt', 'asc'))
     }
 
     const unsubscribe = onSnapshot(collectionRef, snapshot => {

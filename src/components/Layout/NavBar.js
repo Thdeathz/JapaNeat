@@ -1,18 +1,28 @@
-import React from 'react'
-import { AppBar, Badge, IconButton, Toolbar, Typography } from '@mui/material'
+import React, { useState } from 'react'
+import { AppBar, Badge, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import AccountCircle from '@mui/icons-material/AccountCircle'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteFromWatchinglist, getCurrentVideoId } from '~/pages/VideoDetail/videosSlice'
 import { deleteRoomChat, getCurrentRoomId } from '~/pages/RoomChat/roomChatSlice'
+import useFirestore from '~/hooks/useFirestore'
 
 export default function NavBar() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const videoId = useSelector(getCurrentVideoId)
   const roomId = useSelector(getCurrentRoomId)
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
+
+  const [anchorElNotifications, setAnchorElNotifications] = useState()
+
+  const notifications = useFirestore('notifications').filter(noti => {
+    if (currentUserData.role === 0) {
+      return noti.teacherId === currentUserData.id
+    }
+  })
 
   const handleLiveVideoRoom = () => {
     if (videoId) {
@@ -31,6 +41,15 @@ export default function NavBar() {
         })
       )
     }
+  }
+
+  const handleOpenNotifications = () => {
+    if (notifications.length !== 0) setAnchorElNotifications(true)
+  }
+
+  const handleNavigateToRecordDetail = recordId => {
+    setAnchorElNotifications(false)
+    navigate(`/record/${recordId}`)
   }
 
   return (
@@ -59,11 +78,35 @@ export default function NavBar() {
           </Link>
         </Box>
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-          <IconButton size="large" color="inherit">
-            <Badge badgeContent={2} color="error">
+          <IconButton size="large" color="inherit" onClick={handleOpenNotifications}>
+            <Badge badgeContent={Number(notifications.length)} color="error">
               <NotificationsIcon />
             </Badge>
           </IconButton>
+          <Menu
+            sx={{ mt: '45px' }}
+            id="menu-notifications"
+            anchorEl={anchorElNotifications}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            open={Boolean(anchorElNotifications)}
+            onClose={() => setAnchorElNotifications(false)}
+          >
+            {notifications.map((noti, index) => (
+              <MenuItem key={index} onClick={() => handleNavigateToRecordDetail(noti.recordId)}>
+                <Typography textAlign="center">
+                  {noti.offerDisplayName} need your feedback !!!
+                </Typography>
+              </MenuItem>
+            ))}
+          </Menu>
           <IconButton size="large" edge="end" color="inherit">
             <AccountCircle />
           </IconButton>

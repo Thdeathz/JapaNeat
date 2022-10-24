@@ -17,6 +17,7 @@ import { PropTypes } from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { deleteRoomChat } from './roomChatSlice'
 import { toast } from 'react-toastify'
+import { addDocument } from '~/firebase/services'
 
 const pc = new RTCPeerConnection(servers)
 
@@ -146,7 +147,7 @@ function VideoCall({ video }) {
         const path = await uploadFile(file)
         if (path) {
           try {
-            await addNewRecord({
+            const res = await addNewRecord({
               url: path,
               thumbnail: video.video.thumbnail,
               offer_id: roomData.offerId,
@@ -154,6 +155,14 @@ function VideoCall({ video }) {
               video_detail_id: video.id
             }).unwrap()
             pc.close()
+            addDocument({
+              collectionName: 'notifications',
+              data: {
+                teacherId: video.teacher.id,
+                recordId: res.ids[0],
+                offerDisplayName: roomData.offerDisplayName
+              }
+            })
             dispatch(
               deleteRoomChat({
                 videoId: videoId,
