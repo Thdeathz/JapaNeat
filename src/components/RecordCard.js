@@ -3,16 +3,17 @@ import React from 'react'
 import PersonIcon from '@mui/icons-material/Person'
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer'
 import { PropTypes } from 'prop-types'
-import images from '~/assets/images'
 import { useSelector } from 'react-redux'
 import { selectRecordById } from '~/pages/RecordDetail/recordsSlice'
+import { useNavigate } from 'react-router-dom'
 
 function RecordCard({ recordId }) {
+  const navigate = useNavigate()
   const record = useSelector(state => selectRecordById(state, Number(recordId)))
 
   return (
     <Card className="h-full max-w-[280px]">
-      <CardActionArea>
+      <CardActionArea onClick={() => navigate(`/record/${record.id}`)}>
         <Box className="min-w-[280px] h-full bg-secondary flex justify-center">
           <img className="h-[200px] object-contain" src={record.record.thumbnail} alt="video" />
         </Box>

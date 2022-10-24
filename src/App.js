@@ -5,6 +5,9 @@ import { DefaultLayout } from './components/Layout'
 import RequireAuth from './pages/Auth/RequireAuth'
 import { privateRoutes, publicRoutes } from './router'
 import 'react-toastify/dist/ReactToastify.css'
+import store from './app/store'
+import { recordsApiSlice } from './pages/RecordDetail/recordsSlice'
+import { videosApiSlice } from './pages/VideoDetail/videosSlice'
 
 function App() {
   return (
