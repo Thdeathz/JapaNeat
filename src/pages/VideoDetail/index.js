@@ -24,10 +24,7 @@ export default function VideoDetail() {
               spacing={4}
               justifyContent="center"
             >
-              <Box
-                className="h-full flex flex-row justify-center items-center bg-slate-900"
-                flex={8}
-              >
+              <Box className="h-full flex justify-center bg-slate-900" flex={8}>
                 <video className="hover:cursor-pointer w-full h-full" controls>
                   <source src={video.video.url} type="video/mp4" />
                 </video>

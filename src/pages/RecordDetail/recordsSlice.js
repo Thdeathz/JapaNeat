@@ -3,13 +3,21 @@ import { apiSlice } from '~/api/apiSlice'
 
 const recordsAdapter = createEntityAdapter({})
 
-const initialState = recordsAdapter.getInitialState({})
+const initialState = recordsAdapter.getInitialState({
+  currentUser: JSON.parse(localStorage.getItem('currentUser'))
+})
 
 export const recordsApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getRecords: builder.query({
       query: () => '/record_details',
       transformResponse: res => {
+        if (initialState.currentUser?.role === 0) {
+          const teacherRecord = res.data.filter(
+            record => record.teacher.id === initialState.currentUser.id
+          )
+          return recordsAdapter.setAll(initialState, teacherRecord)
+        }
         return recordsAdapter.setAll(initialState, res.data)
       },
       providesTags: (result, error, arg) => [
@@ -25,12 +33,23 @@ export const recordsApiSlice = apiSlice.injectEndpoints({
           ...initialRecord
         }
       }),
-      invalidatesTags: [{ type: 'Post', id: 'List' }]
+      invalidatesTags: [{ type: 'Record', id: 'List' }]
+    }),
+    addFeedback: builder.mutation({
+      query: initialFeedback => ({
+        url: '/feedback',
+        method: 'POST',
+        body: {
+          ...initialFeedback
+        }
+      }),
+      invalidatesTags: [{ type: 'Record', id: 'Feedback' }]
     })
   })
 })
 
-export const { useGetRecordsQuery, useAddNewRecordMutation } = recordsApiSlice
+export const { useGetRecordsQuery, useAddNewRecordMutation, useAddFeedbackMutation } =
+  recordsApiSlice
 
 export const selectRecordResult = recordsApiSlice.endpoints.getRecords.select()
 
