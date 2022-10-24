@@ -1,30 +1,32 @@
-import { Box, Button, FormControl, List, ListItem, OutlinedInput } from '@mui/material'
+import { Box } from '@mui/material'
 import React from 'react'
-import SendIcon from '@mui/icons-material/Send'
 import MessageList from './MessageList'
+import { useParams } from 'react-router-dom'
+import useFirestore from '~/hooks/useFirestore'
+import SendMessage from './SendMessage'
 
 export default function ChatBox() {
+  const { videoId, roomId } = useParams()
+  const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
+
+  const messageList = useFirestore(`watchings/${videoId}/rooms/${roomId}/messages`)
+
   return (
     <Box className="flex flex-col justify-between h-full">
+      {console.log('dafasdfasd: ', messageList)}
       <p className="text-center font-semibold text-2xl py-2 text-cardHeadline bg-cardBackground">
         Chat box
       </p>
-      <List className="px-4" component="div">
-        <MessageList sender={true} />
-      </List>
-      <FormControl className="">
-        <Box className="flex flex-row">
-          <OutlinedInput
-            className="grow"
-            id="message"
-            autoComplete="off"
-            placeholder="Enter message..."
+      <Box className="flex flex-col gap-4 h-full px-2 py-4 overflow-y-scroll">
+        {messageList.map((message, index) => (
+          <MessageList
+            key={index}
+            sender={message.message[0] === currentUserData.id}
+            message={message.message[1]}
           />
-          <Button variant="contained" color="secondaryBtn">
-            <SendIcon color="primary" />
-          </Button>
-        </Box>
-      </FormControl>
+        ))}
+      </Box>
+      <SendMessage />
     </Box>
   )
 }

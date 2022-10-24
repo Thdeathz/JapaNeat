@@ -1,21 +1,22 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { ListItem } from '@mui/material'
+import { Box } from '@mui/material'
 
-function MessageList({ sender }) {
+function MessageList({ sender, message }) {
   return sender ? (
-    <ListItem className="bg-hightlight max-w-[75%] text-right float-right rounded-lg">
-      Sender
-    </ListItem>
+    <Box className="flex justify-end">
+      <p className="bg-hightlight py-2 px-4 max-w-[75%] rounded-lg">{message}</p>
+    </Box>
   ) : (
-    <ListItem className="bg-cardHeadline max-w-[75%] text-left float-left">
-      <p>Reciver</p>
-    </ListItem>
+    <Box className="flex justify-start">
+      <p className="bg-cardHeadline py-2 px-4 max-w-[75%] rounded-lg">{message}</p>
+    </Box>
   )
 }
 
 MessageList.propTypes = {
-  sender: PropTypes.bool
+  sender: PropTypes.bool,
+  message: PropTypes.string
 }
 
 export default MessageList

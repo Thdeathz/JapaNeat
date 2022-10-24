@@ -33,6 +33,9 @@ export const recordsApiSlice = apiSlice.injectEndpoints({
           ...initialRecord
         }
       }),
+      transformResponse: res => {
+        return recordsAdapter.addOne(initialState, res.data)
+      },
       invalidatesTags: [{ type: 'Record', id: 'List' }]
     }),
     addFeedback: builder.mutation({

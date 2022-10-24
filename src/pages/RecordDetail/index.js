@@ -38,7 +38,6 @@ export default function RecordDetail() {
 
   return (
     <>
-      {console.log('asdfasdfasd: ', record)}
       {videosLoading || recordsLoading ? (
         <Loading />
       ) : (
