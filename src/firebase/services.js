@@ -6,6 +6,7 @@ import {
   doc,
   getDocs,
   query,
+  serverTimestamp,
   setDoc,
   updateDoc,
   where
@@ -15,9 +16,15 @@ export const addDocument = async document => {
   const collectionRef = collection(db, document.collectionName)
   let res = null
   if (document.id) {
-    res = await setDoc(doc(db, String(document.collectionName), String(document.id)), document.data)
+    res = await setDoc(doc(db, String(document.collectionName), String(document.id)), {
+      ...document.data,
+      createdAt: serverTimestamp()
+    })
   } else {
-    res = await addDoc(collectionRef, document.data)
+    res = await addDoc(collectionRef, {
+      ...document.data,
+      createdAt: serverTimestamp()
+    })
   }
 }
 

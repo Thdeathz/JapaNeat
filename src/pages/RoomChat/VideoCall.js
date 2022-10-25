@@ -160,7 +160,7 @@ function VideoCall({ video }) {
               data: {
                 teacherId: video.teacher.id,
                 recordId: res.ids[0],
-                offerDisplayName: roomData.offerDisplayName
+                message: `${roomData.offerDisplayName} need your feedback !!!`
               }
             })
             dispatch(

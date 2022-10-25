@@ -30,7 +30,7 @@ function RecordCard({ recordId }) {
                 Category
               </Typography>
               <Typography component="p">
-                <PersonIcon /> {record.offer}
+                <PersonIcon /> {record.offer.name}
               </Typography>
             </Box>
             <Box className="text-right">

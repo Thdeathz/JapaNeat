@@ -16,8 +16,7 @@ export default function SendMessage() {
     await addDocument({
       collectionName: `watchings/${videoId}/rooms/${roomId}/messages`,
       data: {
-        message: [currentUserData.id, message],
-        createdAt: serverTimestamp()
+        message: [currentUserData.id, message]
       }
     })
     setMessage('')
