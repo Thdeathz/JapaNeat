@@ -8,6 +8,7 @@ import { useGetVideosQuery } from '../VideoDetail/videosSlice'
 import { selectRecordById, useAddFeedbackMutation, useGetRecordsQuery } from './recordsSlice'
 import SendIcon from '@mui/icons-material/Send'
 import CircularProgress from '@mui/material/CircularProgress'
+import { addDocument } from '~/firebase/services'
 
 export default function RecordDetail() {
   const { recordId } = useParams()
@@ -30,6 +31,15 @@ export default function RecordDetail() {
         comment: comment,
         bonus_point: Number(bonusPoint)
       }).unwrap()
+      await addDocument({
+        collectionName: 'notifications',
+        data: {
+          offerId: record.offer.id,
+          answerId: record.answer.id,
+          recordId: record.id,
+          message: `${record.teacher.name} had given feedback for your record !!!`
+        }
+      })
       navigate('/')
     } catch (error) {
       console.log(error)
@@ -51,7 +61,7 @@ export default function RecordDetail() {
             <Box flex={8} color="secondary">
               <Box className="flex justify-between items-center">
                 <h1 className="font-bold text-default text-4xl">
-                  Record kaiwa of {record.offer} and {record.answer}
+                  Record kaiwa of {record.offer.name} and {record.answer.name}
                 </h1>
                 <h1 className="text-xl">01/01/2000</h1>
               </Box>

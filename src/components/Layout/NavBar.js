@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { deleteFromWatchinglist, getCurrentVideoId } from '~/pages/VideoDetail/videosSlice'
 import { deleteRoomChat, getCurrentRoomId } from '~/pages/RoomChat/roomChatSlice'
 import useFirestore from '~/hooks/useFirestore'
+import { deleteDocument } from '~/firebase/services'
 
 export default function NavBar() {
   const dispatch = useDispatch()
@@ -21,6 +22,8 @@ export default function NavBar() {
   const notifications = useFirestore('notifications').filter(noti => {
     if (currentUserData.role === 0) {
       return noti.teacherId === currentUserData.id
+    } else if (currentUserData.role === 1) {
+      return noti.offerId === currentUserData.id || noti.answerId === currentUserData.id
     }
   })
 
@@ -47,9 +50,15 @@ export default function NavBar() {
     if (notifications.length !== 0) setAnchorElNotifications(true)
   }
 
-  const handleNavigateToRecordDetail = recordId => {
+  const handleNavigateToRecordDetail = async (recordId, notiId) => {
     setAnchorElNotifications(false)
     navigate(`/record/${recordId}`)
+    if (currentUserData.role === 1) {
+      await deleteDocument({
+        collectionName: 'notifications',
+        id: notiId
+      })
+    }
   }
 
   return (
@@ -100,10 +109,11 @@ export default function NavBar() {
             onClose={() => setAnchorElNotifications(false)}
           >
             {notifications.map((noti, index) => (
-              <MenuItem key={index} onClick={() => handleNavigateToRecordDetail(noti.recordId)}>
-                <Typography textAlign="center">
-                  {noti.offerDisplayName} need your feedback !!!
-                </Typography>
+              <MenuItem
+                key={index}
+                onClick={() => handleNavigateToRecordDetail(noti.recordId, noti.id)}
+              >
+                <Typography textAlign="center">{noti.message}</Typography>
               </MenuItem>
             ))}
           </Menu>
