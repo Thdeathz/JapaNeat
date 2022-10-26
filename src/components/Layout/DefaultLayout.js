@@ -2,21 +2,19 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import NavBar from './NavBar'
 import { Box, Stack } from '@mui/material'
+import { RightBar } from './RightBar'
 
 function DefaultLayout({ children }) {
   return (
     <>
       <NavBar />
-      <Stack className="py-2" direction="row" spacing={2} justifyContent="space-between">
-        <Box flex={1} color="secondary">
-          <h1>SideBar</h1>
-        </Box>
+      <Stack className="p-2 relative" direction="row" spacing={2} justifyContent="space-between">
+        <Box flex={1} color="secondary"></Box>
         <Box flex={10}>{children}</Box>
-        <Box flex={1}>
-          <h1>RightBar</h1>
+        <Box className="flex flex-col items-center gap-4" flex={1}>
+          <RightBar />
         </Box>
       </Stack>
-      <div>Footer</div>
     </>
   )
 }
