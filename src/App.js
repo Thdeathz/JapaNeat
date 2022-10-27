@@ -5,14 +5,19 @@ import { DefaultLayout } from './components/Layout'
 import RequireAuth from './pages/Auth/RequireAuth'
 import { privateRoutes, publicRoutes } from './router'
 import 'react-toastify/dist/ReactToastify.css'
-import store from './app/store'
-import { recordsApiSlice } from './pages/RecordDetail/recordsSlice'
-import { videosApiSlice } from './pages/VideoDetail/videosSlice'
+import { Box } from '@mui/material'
+
+const styles = {
+  cursor: 'url(https://cdn.custom-cursor.com/db/13717/32/memes-quby-pointer.png), auto',
+  'a, button:hover, video:hover': {
+    cursor: 'url(https://cdn.custom-cursor.com/db/13718/32/memes-quby-cursor.png), pointer'
+  }
+}
 
 function App() {
   return (
     <Router>
-      <div className="App">
+      <Box className="App" sx={styles}>
         <ToastContainer autoClose={2000} style={{ fontSize: '16px' }} />
         <Routes>
           {publicRoutes.map((route, index) => {
@@ -48,7 +53,7 @@ function App() {
             })}
           </Route>
         </Routes>
-      </div>
+      </Box>
     </Router>
   )
 }

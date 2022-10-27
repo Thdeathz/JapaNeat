@@ -10,9 +10,9 @@ import {
   Tab,
   Tabs
 } from '@mui/material'
-import BackgroundMusic from './BackgroundMusic'
-import Theme from './Theme'
-import FloatButton from './FloatButton'
+import BackgroundMusic from '../../BackgroundMusic'
+import Theme from '../../Theme'
+import FloatButton from '../../FloatButton'
 
 const a11yProps = index => {
   return {
@@ -26,8 +26,8 @@ function SettingModal({ openModal, setOpenModal }) {
 
   return (
     <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-      <DialogTitle>Setting</DialogTitle>
-      <DialogContent>
+      <DialogTitle>⚙️ Setting</DialogTitle>
+      <DialogContent className="h-[40vh] w-[40vw] overflow-y-scroll">
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
             <Tab label={<p className="text-default">Background music</p>} id={0} />
@@ -58,8 +58,8 @@ function SettingModal({ openModal, setOpenModal }) {
 }
 
 SettingModal.propTypes = {
-  openModal: PropTypes,
-  setOpenModal: PropTypes
+  openModal: PropTypes.bool,
+  setOpenModal: PropTypes.any
 }
 
 export default SettingModal
