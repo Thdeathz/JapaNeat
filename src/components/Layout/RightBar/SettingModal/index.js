@@ -13,16 +13,46 @@ import {
 import BackgroundMusic from '../../BackgroundMusic'
 import Theme from '../../Theme'
 import FloatButton from '../../FloatButton'
-
-const a11yProps = index => {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`
-  }
-}
+import { toast } from 'react-toastify'
 
 function SettingModal({ openModal, setOpenModal }) {
+  const currentAchievement = JSON.parse(localStorage.getItem('currentAchievements'))
   const [tabValue, setTabValue] = useState(0)
+  const [setting, setSetting] = useState({
+    music: localStorage.getItem('music'),
+    theme: null,
+    cursor: localStorage.getItem('cursor'),
+    floatButton: localStorage.getItem('floatButton')
+  })
+
+  const handleSetSetting = () => {
+    if (setting.music) {
+      localStorage.setItem('music', JSON.stringify(setting.music.url))
+    } else if (localStorage.getItem('music')) {
+      localStorage.removeItem('music')
+    }
+    if (setting.cursor) {
+      const style = {
+        cursor: `url(${setting.cursor.url}), auto`,
+        'a, button:hover, video:hover': {
+          cursor: `url(${setting.cursor.image}), pointer`
+        }
+      }
+      localStorage.setItem('cursor', JSON.stringify(style))
+    } else if (localStorage.getItem('cursor')) {
+      localStorage.removeItem('cursor')
+    }
+    if (setting.floatButton) {
+      localStorage.setItem('floatButton', JSON.stringify(setting.floatButton.image))
+    } else if (localStorage.getItem('floatButton')) {
+      localStorage.removeItem('floatButton')
+    }
+    setOpenModal(false)
+    window.location.reload()
+    toast.info('Your change had been save !!!', {
+      toastId: 1
+    })
+  }
 
   return (
     <Dialog open={openModal} onClose={() => setOpenModal(false)}>
@@ -36,20 +66,38 @@ function SettingModal({ openModal, setOpenModal }) {
           </Tabs>
         </Box>
         <Box hidden={tabValue !== 0} id={0}>
-          {tabValue === 0 && <BackgroundMusic />}
+          {tabValue === 0 && (
+            <BackgroundMusic
+              currentAchievement={currentAchievement}
+              setting={setting}
+              setSetting={setSetting}
+            />
+          )}
         </Box>
         <Box hidden={tabValue !== 1} id={1}>
-          {tabValue === 1 && <Theme />}
+          {tabValue === 1 && (
+            <Theme
+              currentAchievement={currentAchievement}
+              setting={setting}
+              setSetting={setSetting}
+            />
+          )}
         </Box>
         <Box hidden={tabValue !== 2} id={2}>
-          {tabValue === 2 && <FloatButton />}
+          {tabValue === 2 && (
+            <FloatButton
+              currentAchievement={currentAchievement}
+              setting={setting}
+              setSetting={setSetting}
+            />
+          )}
         </Box>
       </DialogContent>
       <DialogActions>
         <Button color="secondary" onClick={() => setOpenModal(false)}>
           Cancel
         </Button>
-        <Button color="secondary" onClick={() => setOpenModal(false)}>
+        <Button color="secondary" onClick={handleSetSetting}>
           Save
         </Button>
       </DialogActions>

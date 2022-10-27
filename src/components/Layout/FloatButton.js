@@ -1,25 +1,61 @@
-import { Box, Button, Grid } from '@mui/material'
 import React from 'react'
+import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
+import { Box, Button, Grid } from '@mui/material'
+import { selectAllAchievements } from './Achievement/achievementsSlice'
 
-export default function FloatButton() {
+function FloatButton({ currentAchievement, setting, setSetting }) {
+  const floatButton = useSelector(selectAllAchievements)?.filter(
+    achievement => achievement.type === 2
+  )
+
+  const handldeSelectSetting = achievement => {
+    if (!setting?.floatButton?.id) {
+      setSetting({ ...setting, floatButton: achievement })
+    } else {
+      setSetting({ ...setting, floatButton: null })
+    }
+  }
+
   return (
     <Box className="py-2 px-4">
       <Grid className="gap-8" container>
-        <Button className="flex flex-row">
-          <img
-            className="w-[80px] h-[80px] object-contain"
-            src="https://firebasestorage.googleapis.com/v0/b/japaneat-525ab.appspot.com/o/floatButton%2Ftext-bubble-phase-flat-pixelated-260nw-488743813-removebg-preview.png?alt=media&token=27e42b3c-3933-4042-903d-4711b35b6cb9"
-          />
-          <p className="text-default">100 🚀</p>
-        </Button>
-        <Button className="flex flex-row">
-          <img
-            className="w-[80px] h-[80px] object-contain"
-            src="https://firebasestorage.googleapis.com/v0/b/japaneat-525ab.appspot.com/o/floatButton%2F2-removebg-preview.png?alt=media&token=343d63d8-6c72-4c7e-a607-fd6dc952b8da"
-          />
-          <p className="text-default">100 🚀</p>
-        </Button>
+        {floatButton?.map(achievement => {
+          if (!Boolean(currentAchievement?.find(each => each.id == achievement.id)) && !setting) {
+            return (
+              <Button key={achievement.id} className="flex flex-row">
+                <img className="w-[80px] h-[80px] object-contain" src={achievement.image} />
+                <p className="text-default">{achievement.require_point} 🚀</p>
+              </Button>
+            )
+          } else if (
+            Boolean(currentAchievement?.find(each => each.id == achievement.id)) &&
+            setting
+          ) {
+            return (
+              <Button
+                key={achievement.id}
+                sx={
+                  setting?.floatButton && {
+                    border: '2px solid rgb(132 204 22)'
+                  }
+                }
+                onClick={() => handldeSelectSetting(achievement)}
+              >
+                <img className="w-[80px] h-[80px] object-contain" src={achievement.image} />
+              </Button>
+            )
+          }
+        })}
       </Grid>
     </Box>
   )
 }
+
+FloatButton.propTypes = {
+  currentAchievement: PropTypes.array,
+  setting: PropTypes.object,
+  setSetting: PropTypes.func
+}
+
+export default FloatButton

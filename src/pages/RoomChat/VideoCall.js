@@ -216,7 +216,7 @@ function VideoCall({ video }) {
           >
             Open Camera
           </Button>
-        ) : roomData.offerId === currentUser.id ? (
+        ) : roomData?.offerId === currentUser.id ? (
           <ReactMediaRecorder
             screen
             render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (

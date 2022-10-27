@@ -24,6 +24,7 @@ export default function LoginEmail() {
       dispatch(setCerdentials({ ...userData, user: userData.user }))
       setCookie('token', userData.token)
       localStorage.setItem('currentUser', JSON.stringify(userData.user))
+      localStorage.setItem('currentAchievements', JSON.stringify(userData.achievements))
       navigate('/demo')
     } catch (error) {
       console.log('Toang meo chay r loi cc: ', error)
