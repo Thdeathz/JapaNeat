@@ -10,7 +10,7 @@ export default function VideoList() {
 
   return (
     <Box className="flex justify-center items-start">
-      <Grid className="desktop:max-w-[1200px] max-w-[904px]" container spacing={2}>
+      <Grid className="gap-6 desktop:max-w-[1200px] max-w-[904px]" container>
         {videosIds?.map(videoId => (
           <Grid key={videoId} item>
             <VideoCard videoId={videoId} />

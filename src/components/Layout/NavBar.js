@@ -1,5 +1,14 @@
 import React, { useState } from 'react'
-import { AppBar, Badge, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material'
+import {
+  AppBar,
+  Badge,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography
+} from '@mui/material'
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import AccountCircle from '@mui/icons-material/AccountCircle'
@@ -9,6 +18,9 @@ import { deleteFromWatchinglist, getCurrentVideoId } from '~/pages/VideoDetail/v
 import { deleteRoomChat, getCurrentRoomId } from '~/pages/RoomChat/roomChatSlice'
 import useFirestore from '~/hooks/useFirestore'
 import { deleteDocument } from '~/firebase/services'
+import Achievement from './Achievement'
+import { useGetCurrentPointQuery } from './Achievement/achievementsSlice'
+import CircularProgress from '@mui/material/CircularProgress'
 
 export default function NavBar() {
   const dispatch = useDispatch()
@@ -16,8 +28,12 @@ export default function NavBar() {
   const videoId = useSelector(getCurrentVideoId)
   const roomId = useSelector(getCurrentRoomId)
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
+  const { data: currentPoint, isLoading: pointLoading } = useGetCurrentPointQuery(
+    currentUserData.id
+  )
 
-  const [anchorElNotifications, setAnchorElNotifications] = useState()
+  const [anchorElNotifications, setAnchorElNotifications] = useState(false)
+  const [anchorElPoint, setAnchorElPoint] = useState(false)
 
   const notifications = useFirestore('notifications').filter(noti => {
     if (currentUserData.role === 0) {
@@ -63,8 +79,8 @@ export default function NavBar() {
 
   return (
     <AppBar position="sticky">
-      <Toolbar className="flex flex-row justify-between">
-        <Typography variant="h6" noWrap component="div">
+      <Toolbar className="flex justify-center">
+        <Typography className="absolute left-[24px]" variant="h6" noWrap component="div">
           <Link to="/">JapaNeat</Link>
         </Typography>
         <Box className="flex flex-row justify-center items-center gap-16">
@@ -86,7 +102,32 @@ export default function NavBar() {
             Ranking
           </Link>
         </Box>
-        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+        <Box className="absolute right-[24px]">
+          {!pointLoading && (
+            <>
+              <Button color="textDefault" onClick={() => setAnchorElPoint(true)}>
+                {Number(currentPoint?.point)} 🚀
+              </Button>
+              <Menu
+                className="mt-10 w-[30vw]"
+                id="menu-achievements"
+                anchorEl={anchorElPoint}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right'
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right'
+                }}
+                open={Boolean(anchorElPoint)}
+                onClose={() => setAnchorElPoint(false)}
+              >
+                <Achievement />
+              </Menu>
+            </>
+          )}
           <IconButton size="large" color="inherit" onClick={handleOpenNotifications}>
             <Badge badgeContent={Number(notifications.length)} color="error">
               <NotificationsIcon />

@@ -49,8 +49,9 @@ export const RightBar = () => {
         />
         <SpeedDialAction
           key={'setting'}
-          icon={<SettingsIcon onClick={() => setOpenModal(true)} />}
+          icon={<SettingsIcon />}
           tooltipTitle={'setting'}
+          onClick={() => setOpenModal(true)}
         />
       </SpeedDial>
       <SettingModal openModal={openModal} setOpenModal={setOpenModal} />
