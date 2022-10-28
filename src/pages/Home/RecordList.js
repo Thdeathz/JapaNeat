@@ -11,7 +11,7 @@ export default function RecordList() {
   return (
     <Box className="flex flex-col justify-center items-start">
       {recordIds && <FilterArea type="Records" />}
-      <Grid className="desktop:max-w-[1200px] max-w-[904px]" container spacing={2}>
+      <Grid className="gap-6 desktop:max-w-[1200px] max-w-[904px]" container>
         {recordIds?.map(recordId => (
           <Grid key={recordId} item>
             <RecordCard recordId={recordId} />

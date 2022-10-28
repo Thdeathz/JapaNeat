@@ -52,6 +52,7 @@ export default function LoginEmail() {
         fullWidth
         required
         size="medium"
+        type="password"
         id="Password"
         label="Password"
         variant="standard"

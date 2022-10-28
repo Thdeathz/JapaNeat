@@ -21,6 +21,7 @@ import { deleteDocument } from '~/firebase/services'
 import Achievement from './Achievement'
 import { useGetCurrentPointQuery } from './Achievement/achievementsSlice'
 import CircularProgress from '@mui/material/CircularProgress'
+import images from '~/assets/images'
 
 export default function NavBar() {
   const dispatch = useDispatch()
@@ -81,9 +82,14 @@ export default function NavBar() {
     <AppBar position="sticky">
       <Toolbar className="flex justify-center">
         <Typography className="absolute left-[24px]" variant="h6" noWrap component="div">
-          <Link to="/">JapaNeat</Link>
+          <Link to="/">
+            <img className="w-[15%]" src={images.logo} />
+          </Link>
         </Typography>
-        <Box className="flex flex-row justify-center items-center gap-16">
+        <Box
+          className="flex flex-row justify-center items-center gap-16"
+          sx={{ display: { xs: 'none', md: 'flex' } }}
+        >
           <Link
             to="/"
             className="text-xl font-medium text-default hover:text-textHover"
