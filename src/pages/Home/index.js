@@ -16,14 +16,8 @@ export default function Home() {
         <Loading />
       ) : (
         <Box className="flex flex-col justify-center items-center gap-24">
-          <Box>
-            <h1 className="text-bold text-4xl text-center mb-4">Videos</h1>
-            <VideoList />
-          </Box>
-          <Box>
-            <h1 className="text-bold text-4xl text-center mb-4">Records</h1>
-            <RecordList />
-          </Box>
+          <VideoList />
+          <RecordList />
         </Box>
       )}
     </>

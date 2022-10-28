@@ -12,21 +12,7 @@ function App() {
 
   return (
     <Router>
-      <Box
-        className="App"
-        sx={
-          style
-            ? JSON.parse(style)
-            : {
-                cursor:
-                  'url(https://cdn.custom-cursor.com/db/13717/32/memes-quby-pointer.png), auto',
-                'a, button:hover, video:hover': {
-                  cursor:
-                    'url(https://cdn.custom-cursor.com/db/13718/32/memes-quby-cursor.png), pointer'
-                }
-              }
-        }
-      >
+      <Box className="App" sx={style && JSON.parse(style)}>
         <ToastContainer autoClose={2000} style={{ fontSize: '16px' }} />
         <Routes>
           {publicRoutes.map((route, index) => {
