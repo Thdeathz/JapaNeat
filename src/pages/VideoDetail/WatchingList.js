@@ -24,6 +24,7 @@ import { getDocument } from '~/firebase/services'
 import useFirestore from '~/hooks/useFirestore'
 import { addToWatchinglist, deleteFromWatchinglist, getCurrentVideoId } from './videosSlice'
 import { changeRoomStatus, sendOffer } from '../RoomChat/roomChatSlice'
+import AccountCircle from '@mui/icons-material/AccountCircle'
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -192,7 +193,7 @@ export default function WatchingList() {
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       variant="dot"
                     >
-                      <Avatar alt="avatar image" src={images.demoImage} />
+                      <AccountCircle />
                     </StyledBadge>
                     <h4 className="ml-4 text-xl text-default">{user?.userName}</h4>
                     <CameraIndoorIcon />
