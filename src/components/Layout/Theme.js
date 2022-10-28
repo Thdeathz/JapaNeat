@@ -21,22 +21,35 @@ function Theme({ currentAchievement, setting, setSetting }) {
     <Box className="py-2 px-4">
       <h3 className="mb-3">Theme color</h3>
       <Grid container spacing={2}>
-        {achievements?.map(achievement => {
-          if (
-            !Boolean(currentAchievement?.find(each => each.id == achievement.id)) &&
-            !achievement.url
-          ) {
-            return (
-              <Box key={achievement.id}>
-                <Card className="m-4">
-                  <CardActionArea>
-                    <Paper className="w-[100px] h-[100px]" sx={{ backgroundColor: '#3da9fc' }} />
-                  </CardActionArea>
-                </Card>
-              </Box>
-            )
-          }
-        })}
+        {!setting ? (
+          <>
+            <Card className="m-4">
+              <CardActionArea>
+                <Paper className="w-[100px] h-[100px]" sx={{ backgroundColor: '#fec7d7' }} />
+              </CardActionArea>
+            </Card>
+            <Card className="m-4">
+              <CardActionArea>
+                <Paper className="w-[100px] h-[100px]" sx={{ backgroundColor: '#ff8e3c' }} />
+              </CardActionArea>
+            </Card>
+          </>
+        ) : (
+          <>
+            <Card className="m-4">
+              <CardActionArea>
+                <Paper className="w-[100px] h-[100px]" sx={{ backgroundColor: '#e3f6f5' }} />
+              </CardActionArea>
+            </Card>
+            <Box className="border-lime-500 border-2">
+              <Card className="m-4">
+                <CardActionArea>
+                  <Paper className="w-[100px] h-[100px]" sx={{ backgroundColor: '#ffffe' }} />
+                </CardActionArea>
+              </Card>
+            </Box>
+          </>
+        )}
       </Grid>
       <h3 className="mb-3">Cursor</h3>
       <Grid className="gap-8" container>

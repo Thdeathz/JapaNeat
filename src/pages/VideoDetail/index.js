@@ -18,21 +18,16 @@ export default function VideoDetail() {
       ) : (
         <>
           <Box className="flex justify-center">
-            <Stack
-              className="py-2 h-[75vh] desktop:w-[90vw]"
-              direction="row"
-              spacing={4}
-              justifyContent="center"
-            >
-              <Box className="h-full flex justify-center bg-slate-900" flex={8}>
+            <Box className="laptop:flex justify-center gap-4 py-2 laptop:h-[75vh] desktop:w-[90vw]">
+              <Box className="laptop:h-full flex justify-center bg-slate-900" flex={8}>
                 <video className="hover:cursor-pointer w-full h-full" controls>
                   <source src={video.video.url} type="video/mp4" />
                 </video>
               </Box>
-              <Box className="bg-secondary h-full" flex={3}>
+              <Box className="bg-secondary laptop:h-full h-[500px]" flex={3}>
                 <WatchingList />
               </Box>
-            </Stack>
+            </Box>
           </Box>
           <Box className="flex justify-center">
             <Stack

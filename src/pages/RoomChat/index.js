@@ -20,22 +20,17 @@ export default function RoomChat() {
         <Loading />
       ) : (
         <Box className="flex justify-center">
-          <Stack
-            className="py-2 h-[80vh] desktop:w-[90vw]"
-            direction="row"
-            spacing={2}
-            justifyContent="center"
-          >
-            <Box className="h-full" flex={9} color="secondary">
+          <Box className="laptop:flex justify-center gap-4 py-2 laptop:h-[80vh] desktop:w-[90vw]">
+            <Box className="laptop:h-full basis-[70%]" color="secondary">
               <VideoControl video={video} />
             </Box>
-            <Box className="h-full" flex={3} color="secondary">
+            <Box className="laptop:h-full basis-[25%]" color="secondary">
               <VideoCall video={video} />
             </Box>
-            <Box className="bg-secondary h-full" flex={4}>
+            <Box className="bg-secondary laptop:h-full h-[500px] basis-[30%]">
               <ChatBox />
             </Box>
-          </Stack>
+          </Box>
         </Box>
       )}
     </>

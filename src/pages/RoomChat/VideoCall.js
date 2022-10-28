@@ -192,7 +192,6 @@ function VideoCall({ video }) {
 
   return (
     <Box className="h-full flex flex-col gap-4">
-      {console.log('RoomData: ', roomData)}
       <Box className="basis-3/4 flex flex-col gap-4 items-center">
         <video
           className="basis-1/2 object-cover bg-slate-800"

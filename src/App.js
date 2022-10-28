@@ -5,7 +5,8 @@ import { DefaultLayout } from './components/Layout'
 import RequireAuth from './pages/Auth/RequireAuth'
 import { privateRoutes, publicRoutes } from './router'
 import 'react-toastify/dist/ReactToastify.css'
-import { Box } from '@mui/material'
+import { Box, ThemeProvider } from '@mui/material'
+import { theme } from './app/theme'
 
 function App() {
   const style = localStorage.getItem('cursor')
@@ -39,9 +40,11 @@ function App() {
                   key={index}
                   path={route.path}
                   element={
-                    <Layout>
-                      <Page />
-                    </Layout>
+                    <ThemeProvider theme={theme}>
+                      <Layout>
+                        <Page />
+                      </Layout>
+                    </ThemeProvider>
                   }
                 />
               )
