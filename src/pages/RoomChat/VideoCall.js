@@ -180,17 +180,19 @@ function VideoCall({ video }) {
   }
 
   useEffect(() => {
-    const fetchRoomData = () => {
-      onSnapshot(doc(db, `watchings/${videoId}/rooms`, String(roomId)), snapshot =>
-        setRoomData({ ...snapshot.data() })
-      )
-    }
+    const fetchRoomData = onSnapshot(
+      doc(db, `watchings/${videoId}/rooms`, String(roomId)),
+      snapshot => {
+        setRoomData(snapshot.data())
+      }
+    )
 
     return fetchRoomData
   }, [videoId, roomId])
 
   return (
     <Box className="h-full flex flex-col gap-4">
+      {console.log('RoomData: ', roomData)}
       <Box className="basis-3/4 flex flex-col gap-4 items-center">
         <video
           className="basis-1/2 object-cover bg-slate-800"

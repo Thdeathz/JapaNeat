@@ -103,7 +103,7 @@ export default function NavBar() {
           </Link>
         </Box>
         <Box className="absolute right-[24px]">
-          {!pointLoading && (
+          {!pointLoading && currentUserData.role === 1 && (
             <>
               <Button color="textDefault" onClick={() => setAnchorElPoint(true)}>
                 {Number(currentPoint?.point)} 🚀

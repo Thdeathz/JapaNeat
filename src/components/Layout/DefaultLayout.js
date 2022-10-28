@@ -5,6 +5,8 @@ import { Box, Stack } from '@mui/material'
 import { RightBar } from './RightBar'
 
 function DefaultLayout({ children }) {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+
   return (
     <>
       <NavBar />
@@ -12,7 +14,7 @@ function DefaultLayout({ children }) {
         <Box flex={1} color="secondary"></Box>
         <Box flex={10}>{children}</Box>
         <Box className="flex flex-col items-center gap-4" flex={1}>
-          <RightBar />
+          {currentUser.role === 1 && <RightBar />}
         </Box>
       </Stack>
     </>

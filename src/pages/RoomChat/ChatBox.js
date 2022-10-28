@@ -13,7 +13,6 @@ export default function ChatBox() {
 
   return (
     <Box className="flex flex-col justify-between h-full">
-      {console.log('dafasdfasd: ', messageList)}
       <p className="text-center font-semibold text-2xl py-2 text-cardHeadline bg-cardBackground">
         Chat box
       </p>

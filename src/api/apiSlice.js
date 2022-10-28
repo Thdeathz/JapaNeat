@@ -2,7 +2,8 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getCookie } from '~/hooks/getCookie'
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://127.0.0.1:8000/api',
+  // baseUrl: 'http://127.0.0.1:8000/api',
+  baseUrl: 'https://japaneat.herokuapp.com/api',
   prepareHeaders: headers => {
     const token = getCookie('token')
     if (token) {
