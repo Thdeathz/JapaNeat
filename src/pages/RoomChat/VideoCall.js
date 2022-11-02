@@ -65,7 +65,7 @@ function VideoCall({ video }) {
 
     const callData = (await getDoc(room)).data()
 
-    if (callData.offerId === currentUser.id) {
+    if (!callData.offer) {
       pc.onicecandidate = event => {
         event.candidate && addDoc(offerCandidates, event.candidate.toJSON())
       }
@@ -95,13 +95,21 @@ function VideoCall({ video }) {
           }
         })
       })
-    } else if (callData.answerId === currentUser.id) {
+    } else {
       pc.onicecandidate = event => {
         event.candidate && addDoc(answerCandidates, event.candidate.toJSON())
       }
 
       const offerDescription = callData.offer
       await pc.setRemoteDescription(new RTCSessionDescription(offerDescription))
+
+      // onSnapshot(room, snapshot => {
+      //   const data = snapshot.data()
+      //   if (!pc.currentRemoteDescription && data?.offer) {
+      //     const offerDescription = new RTCSessionDescription(data.offer)
+      //     pc.setRemoteDescription(offerDescription)
+      //   }
+      // })
 
       const answerDescription = await pc.createAnswer()
       await pc.setLocalDescription(answerDescription)
@@ -180,12 +188,81 @@ function VideoCall({ video }) {
   }
 
   useEffect(() => {
-    const fetchRoomData = onSnapshot(
-      doc(db, `watchings/${videoId}/rooms`, String(roomId)),
-      snapshot => {
+    const fetchRoomData = async () => {
+      // const remoteStream = new MediaStream()
+
+      // pc.ontrack = event => {
+      //   event.streams[0].getTracks().forEach(track => {
+      //     remoteStream.addTrack(track)
+      //   })
+      // }
+
+      // remoteRef.current.srcObject = remoteStream
+
+      // const room = doc(db, `watchings/${videoId}/rooms`, String(roomId))
+      // const offerCandidates = collection(room, 'offerCandidates')
+      // const answerCandidates = collection(room, 'answerCandidates')
+
+      // const callData = (await getDoc(room)).data()
+
+      // console.log('Call data: ', callData)
+
+      // if (callData.offerId === currentUser.id) {
+      //   onSnapshot(room, snapshot => {
+      //     const data = snapshot.data()
+      //     if (!pc.currentRemoteDescription && data?.answer) {
+      //       const answerDescription = new RTCSessionDescription(data.answer)
+      //       pc.setRemoteDescription(answerDescription)
+      //     }
+      //   })
+
+      //   onSnapshot(answerCandidates, snapshot => {
+      //     snapshot.docChanges().forEach(change => {
+      //       if (change.type === 'added') {
+      //         const candidate = new RTCIceCandidate(change.doc.data())
+      //         pc.addIceCandidate(candidate)
+      //       }
+      //     })
+      //   })
+      // } else if (callData.answerId === currentUser.id) {
+      //   // const offerDescription = callData.offer
+      //   // await pc.setRemoteDescription(new RTCSessionDescription(offerDescription))
+      //   onSnapshot(room, snapshot => {
+      //     const data = snapshot.data()
+      //     if (!pc.currentRemoteDescription && data?.offer) {
+      //       const offerDescription = new RTCSessionDescription(data.offer)
+      //       pc.setRemoteDescription(offerDescription)
+      //     }
+      //   })
+
+      //   onSnapshot(offerCandidates, snapshot => {
+      //     snapshot.docChanges().forEach(change => {
+      //       if (change.type === 'added') {
+      //         let data = change.doc.data()
+      //         pc.addIceCandidate(new RTCIceCandidate(data))
+      //       }
+      //       // pc.onconnectionstatechange = event => {
+      //       //   if (pc.connectionState === 'disconnected') {
+      //       //     pc.close()
+      //       //     localStream.getTracks().forEach(track => {
+      //       //       if (track.readyState === 'live') {
+      //       //         track.stop()
+      //       //       }
+      //       //     })
+      //       //     toast.info('Your Kaiwa session is over', {
+      //       //       toastId: 1
+      //       //     })
+      //       //     navigate('/')
+      //       //   }
+      //       // }
+      //     })
+      //   })
+      // }
+
+      onSnapshot(doc(db, `watchings/${videoId}/rooms`, String(roomId)), snapshot => {
         setRoomData(snapshot.data())
-      }
-    )
+      })
+    }
 
     return fetchRoomData
   }, [videoId, roomId])
