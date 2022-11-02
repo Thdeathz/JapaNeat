@@ -1,15 +1,37 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Box, Stack } from '@mui/material'
 import WatchingList from './WatchingList'
 import { useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { selectVideoById, useGetVideosQuery } from './videosSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { addToWatchinglist, selectVideoById, useGetVideosQuery } from './videosSlice'
 import { Loading } from '~/components/Layout'
+import { getDocument } from '~/firebase/services'
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
+import { db } from '~/firebase/config'
 
 export default function VideoDetail() {
+  const dispatch = useDispatch()
   const { videoId } = useParams()
   const { isLoading } = useGetVideosQuery()
   const video = useSelector(state => selectVideoById(state, Number(videoId)))
+  const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
+
+  // const offerList = useFirestore(`watchings/${videoId}/rooms`)
+
+  useEffect(() => {
+    const handleAddUserToWatchingList = async () => {
+      if (currentUserData) {
+        dispatch(
+          addToWatchinglist({
+            videoId: videoId,
+            userData: currentUserData
+          })
+        )
+      }
+    }
+
+    return handleAddUserToWatchingList
+  }, [currentUserData, videoId])
 
   return (
     <>

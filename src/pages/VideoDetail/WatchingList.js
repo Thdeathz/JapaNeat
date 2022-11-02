@@ -22,7 +22,7 @@ import { v4 } from 'uuid'
 import images from '~/assets/images'
 import { getDocument } from '~/firebase/services'
 import useFirestore from '~/hooks/useFirestore'
-import { addToWatchinglist, deleteFromWatchinglist, getCurrentVideoId } from './videosSlice'
+import { deleteFromWatchinglist } from './videosSlice'
 import { changeRoomStatus, sendOffer } from '../RoomChat/roomChatSlice'
 import AccountCircle from '@mui/icons-material/AccountCircle'
 
@@ -49,7 +49,6 @@ export default function WatchingList() {
   const navigate = useNavigate()
   const { videoId } = useParams()
   const dispatch = useDispatch()
-  const currentVideoId = useSelector(getCurrentVideoId)
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
 
   const [openToast, setOpenToast] = useState(false)
@@ -102,26 +101,6 @@ export default function WatchingList() {
     )
     navigate(`/room/${videoId}/${roomData.roomId}`)
   }
-
-  useEffect(() => {
-    const handleAddUserToWatchingList = async () => {
-      if (currentUserData) {
-        const checkAdded = await getDocument({
-          collectionName: `watchings/${videoId}/members`
-        })
-        if (!checkAdded.find(user => user.id === currentUserData.id) && !currentVideoId) {
-          dispatch(
-            addToWatchinglist({
-              videoId: videoId,
-              userData: currentUserData
-            })
-          )
-        }
-      }
-    }
-
-    return handleAddUserToWatchingList
-  }, [currentUserData, videoId])
 
   useEffect(() => {
     const handleOfferNavigate = () => {
