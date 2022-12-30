@@ -9,9 +9,7 @@ import { addDocument, deleteDocument } from '~/firebase/services'
 
 const videosAdapter = createEntityAdapter({})
 
-const initialState = videosAdapter.getInitialState({
-  currentVideoId: null
-})
+const initialState = videosAdapter.getInitialState()
 
 export const videosApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -60,16 +58,7 @@ export const deleteFromWatchinglist = createAsyncThunk(
 const videosSlice = createSlice({
   name: 'videos',
   initialState,
-  reducers: {},
-  extraReducers: builder => {
-    builder
-      .addCase(addToWatchinglist.fulfilled, (state, action) => {
-        state.currentVideoId = action.payload
-      })
-      .addCase(deleteFromWatchinglist.fulfilled, (state, action) => {
-        state.currentVideoId = null
-      })
-  }
+  reducers: {}
 })
 
 export const { useGetVideosQuery } = videosApiSlice
@@ -83,9 +72,5 @@ export const {
   selectById: selectVideoById,
   selectIds: selectVideoIds
 } = videosAdapter.getSelectors(state => selectVideosData(state) ?? initialState)
-
-export const { addCurrentVideoId } = videosSlice.actions
-
-export const getCurrentVideoId = state => state.videos.currentVideoId
 
 export default videosSlice.reducer

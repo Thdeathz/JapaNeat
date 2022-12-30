@@ -12,22 +12,20 @@ import {
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import AccountCircle from '@mui/icons-material/AccountCircle'
-import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { deleteFromWatchinglist, getCurrentVideoId } from '~/pages/VideoDetail/videosSlice'
-import { deleteRoomChat, getCurrentRoomId } from '~/pages/RoomChat/roomChatSlice'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { deleteFromWatchinglist } from '~/pages/VideoDetail/videosSlice'
 import useFirestore from '~/hooks/useFirestore'
-import { deleteDocument } from '~/firebase/services'
+import { deleteDocument, getDocument } from '~/firebase/services'
 import Achievement from './Achievement'
 import { useGetCurrentPointQuery } from './Achievement/achievementsSlice'
-import CircularProgress from '@mui/material/CircularProgress'
 import images from '~/assets/images'
+import { deleteRoomChat } from '~/pages/RoomChat/roomChatSlice'
 
 export default function NavBar() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const videoId = useSelector(getCurrentVideoId)
-  const roomId = useSelector(getCurrentRoomId)
+  const { videoId, roomId } = useParams()
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
   const { data: currentPoint, isLoading: pointLoading } = useGetCurrentPointQuery(
     currentUserData.id
@@ -44,22 +42,34 @@ export default function NavBar() {
     }
   })
 
-  const handleLiveVideoRoom = () => {
+  const handleLeaveRoom = async () => {
     if (videoId) {
-      dispatch(
-        deleteFromWatchinglist({
-          videoId: videoId,
-          userData: currentUserData
-        })
-      )
+      const checkCurrentWatchingVideo = await getDocument({
+        collectionName: `watchings/${videoId}/members`,
+        id: currentUserData.id
+      })
+      if (checkCurrentWatchingVideo) {
+        dispatch(
+          deleteFromWatchinglist({
+            videoId: videoId,
+            userData: currentUserData
+          })
+        )
+      }
     }
     if (roomId) {
-      dispatch(
-        deleteRoomChat({
-          videoId: videoId,
-          roomId: roomId
-        })
-      )
+      const checkCurrentRoom = await getDocument({
+        collectionName: `watchings/${videoId}/rooms`,
+        id: roomId
+      })
+      if (checkCurrentRoom) {
+        dispatch(
+          deleteRoomChat({
+            videoId: videoId,
+            roomId: roomId
+          })
+        )
+      }
     }
   }
 
@@ -82,9 +92,7 @@ export default function NavBar() {
     <AppBar position="sticky">
       <Toolbar className="flex justify-center">
         <Typography className="absolute left-[24px]" variant="h6" noWrap component="div">
-          <Link to="/">
-            <img className="w-[15%]" src={images.logo} />
-          </Link>
+          <Link to="/">JapaNeat</Link>
         </Typography>
         <Box
           className="flex flex-row justify-center items-center gap-16"
@@ -93,8 +101,7 @@ export default function NavBar() {
           <Link
             to="/"
             className="text-xl font-medium text-default hover:text-textHover"
-            underline="none"
-            onClick={handleLiveVideoRoom}
+            onClick={handleLeaveRoom}
           >
             Home
           </Link>

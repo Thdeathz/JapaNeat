@@ -1,23 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Box, Button } from '@mui/material'
+import { ReactMediaRecorder } from 'react-media-recorder'
+import { useDispatch } from 'react-redux'
+import { toast } from 'react-toastify'
+import { PropTypes } from 'prop-types'
+import { Box, IconButton } from '@mui/material'
+import { v4 } from 'uuid'
+import { addDocument } from '~/firebase/services'
 import CameraAltIcon from '@mui/icons-material/CameraAlt'
+import NoPhotographyIcon from '@mui/icons-material/NoPhotography'
 import EmergencyRecordingIcon from '@mui/icons-material/EmergencyRecording'
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
+import MicIcon from '@mui/icons-material/Mic'
+import MicOffIcon from '@mui/icons-material/MicOff'
+import LogoutIcon from '@mui/icons-material/Logout'
 import CircularProgress from '@mui/material/CircularProgress'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import servers from '~/app/servers'
-import { addDoc, collection, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
-import { db } from '~/firebase/config'
-import { ReactMediaRecorder } from 'react-media-recorder'
 import uploadFile from '~/hooks/uploadFile'
-import { v4 } from 'uuid'
 import { useAddNewRecordMutation } from '../RecordDetail/recordsSlice'
-import { PropTypes } from 'prop-types'
-import { useDispatch } from 'react-redux'
 import { deleteRoomChat } from './roomChatSlice'
-import { toast } from 'react-toastify'
-import { addDocument } from '~/firebase/services'
+import { useClient, useMicrophoneAndCameraTracks } from '~/agora/rtc'
+import { AgoraVideoPlayer } from 'agora-rtc-react'
+import { APP_ID } from '~/agora/config'
+import useFirestore from '~/hooks/useFirestore'
 
 const pc = new RTCPeerConnection(servers)
 
@@ -25,117 +31,50 @@ function VideoCall({ video }) {
   const { roomId, videoId } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const localRef = useRef(null)
-  const remoteRef = useRef(null)
 
-  const [roomData, setRoomData] = useState(null)
-  const [webcamActive, setWebcamActive] = useState(false)
+  const roomData = useFirestore(`watchings/${videoId}/rooms`, roomId)
   const [loading, setLoading] = useState(false)
+
+  const client = useClient()
+  const { ready, tracks } = useMicrophoneAndCameraTracks()
+  const [remoteUser, setRemoteUser] = useState(null)
+  const [start, setStart] = useState(false)
+
+  const [webcamActive, setWebcamActive] = useState(true)
+  const [micActive, setMicActive] = useState(true)
 
   const [addNewRecord] = useAddNewRecordMutation()
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser'))
 
   const handleOpenCamera = async () => {
-    const localStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true
-    })
-    localRef.current.srcObject = localStream
-    const remoteStream = new MediaStream()
-
-    localStream.getTracks().forEach(track => {
-      pc.addTrack(track, localStream)
-    })
-
-    pc.ontrack = event => {
-      event.streams[0].getTracks().forEach(track => {
-        remoteStream.addTrack(track)
-      })
+    if (tracks.length !== 0) {
+      console.log('=======> Tracks', tracks)
+      await tracks[1].setEnabled(!webcamActive)
+      setWebcamActive(!webcamActive)
     }
+  }
 
-    localRef.current.srcObject = localStream
-    remoteRef.current.srcObject = remoteStream
-
-    setWebcamActive(true)
-
-    const room = doc(db, `watchings/${videoId}/rooms`, String(roomId))
-    const offerCandidates = collection(room, 'offerCandidates')
-    const answerCandidates = collection(room, 'answerCandidates')
-
-    const callData = (await getDoc(room)).data()
-
-    if (callData.offerId === currentUser.id) {
-      pc.onicecandidate = event => {
-        event.candidate && addDoc(offerCandidates, event.candidate.toJSON())
-      }
-
-      const offerDescription = await pc.createOffer()
-      await pc.setLocalDescription(offerDescription)
-
-      const offer = {
-        sdp: offerDescription.sdp,
-        type: offerDescription.type
-      }
-      await updateDoc(room, { offer: { ...offer } })
-
-      onSnapshot(room, snapshot => {
-        const data = snapshot.data()
-        if (!pc.currentRemoteDescription && data?.answer) {
-          const answerDescription = new RTCSessionDescription(data.answer)
-          pc.setRemoteDescription(answerDescription)
-        }
-      })
-
-      onSnapshot(answerCandidates, snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if (change.type === 'added') {
-            const candidate = new RTCIceCandidate(change.doc.data())
-            pc.addIceCandidate(candidate)
-          }
-        })
-      })
-    } else if (callData.answerId === currentUser.id) {
-      pc.onicecandidate = event => {
-        event.candidate && addDoc(answerCandidates, event.candidate.toJSON())
-      }
-
-      const offerDescription = callData.offer
-      await pc.setRemoteDescription(new RTCSessionDescription(offerDescription))
-
-      const answerDescription = await pc.createAnswer()
-      await pc.setLocalDescription(answerDescription)
-
-      const answer = {
-        type: answerDescription.type,
-        sdp: answerDescription.sdp
-      }
-
-      await updateDoc(room, { answer: { ...answer } })
-
-      onSnapshot(offerCandidates, snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if (change.type === 'added') {
-            let data = change.doc.data()
-            pc.addIceCandidate(new RTCIceCandidate(data))
-          }
-          pc.onconnectionstatechange = event => {
-            if (pc.connectionState === 'disconnected') {
-              pc.close()
-              localStream.getTracks().forEach(track => {
-                if (track.readyState === 'live') {
-                  track.stop()
-                }
-              })
-              toast.info('Your Kaiwa session is over', {
-                toastId: 1
-              })
-              navigate('/')
-            }
-          }
-        })
-      })
+  const handleOpenMic = async () => {
+    if (tracks.length !== 0) {
+      await tracks[0].setEnabled(!micActive)
+      setMicActive(!micActive)
     }
+  }
+
+  const handleLeaveRoom = async () => {
+    await client.leave()
+    client.removeAllListeners()
+    tracks[0].close()
+    tracks[1].close()
+    setStart(false)
+    dispatch(
+      deleteRoomChat({
+        videoId: videoId,
+        roomId: roomId
+      })
+    )
+    navigate('/')
   }
 
   const handleUpload = async mediaBlobUrl => {
@@ -163,13 +102,7 @@ function VideoCall({ video }) {
                 message: `${roomData.offerDisplayName} need your feedback !!!`
               }
             })
-            dispatch(
-              deleteRoomChat({
-                videoId: videoId,
-                roomId: roomId
-              })
-            )
-            navigate('/')
+            handleLeaveRoom()
             setLoading(false)
           } catch (error) {
             console.log(error)
@@ -180,90 +113,106 @@ function VideoCall({ video }) {
   }
 
   useEffect(() => {
-    const fetchRoomData = onSnapshot(
-      doc(db, `watchings/${videoId}/rooms`, String(roomId)),
-      snapshot => {
-        setRoomData(snapshot.data())
-      }
-    )
+    let initRoom = async () => {
+      client.on('user-published', async (user, mediaType) => {
+        await client.subscribe(user, mediaType)
+        if (mediaType === 'video') {
+          setRemoteUser(user)
+        }
+        if (mediaType === 'audiox') {
+          user.audioTrack.play()
+        }
+      })
+      await client.join(APP_ID, roomId, null, currentUser.id)
 
-    return fetchRoomData
-  }, [videoId, roomId])
+      client.on('user-unpublished', (user, mediaType) => {
+        if (mediaType === 'audio') {
+          if (user.audioTrack) user.audioTrack.stop()
+        }
+        if (mediaType === 'video') {
+          setRemoteUser(null)
+        }
+      })
+
+      client.on('user-left', user => {
+        setRemoteUser(null)
+      })
+
+      if (tracks) await client.publish([tracks[0], tracks[1]])
+      setStart(true)
+    }
+
+    if (ready && tracks) {
+      initRoom()
+    }
+
+    if (!roomData) {
+      handleLeaveRoom()
+      toast.info('Your Kaiwa session is over !!!', {
+        toastId: 1
+      })
+    }
+  }, [videoId, roomId, ready, tracks, roomData])
 
   return (
     <Box className="h-full flex flex-col gap-4">
       <Box className="basis-3/4 flex flex-col gap-4 items-center">
-        <video
-          className="basis-1/2 object-cover bg-slate-800"
-          ref={localRef}
-          autoPlay
-          playsInline
-          muted
-        />
-        <video
-          className="basis-1/2 object-cover bg-slate-800"
-          ref={remoteRef}
-          autoPlay
-          playsInline
-        />
+        <Box className="basis-1/2 w-full h-full object-cover bg-slate-800">
+          {start && tracks && (
+            <AgoraVideoPlayer style={{ height: '100%', width: '100%' }} videoTrack={tracks[1]} />
+          )}
+        </Box>
+        <Box className="basis-1/2 w-full h-full object-cover bg-slate-800">
+          {remoteUser?.videoTrack && (
+            <AgoraVideoPlayer
+              style={{ height: '100%', width: '100%' }}
+              videoTrack={remoteUser.videoTrack}
+            />
+          )}
+        </Box>
       </Box>
       <Box className="flex flex-col gap-4">
-        {!webcamActive ? (
-          <Button
-            fullWidth
-            variant="contained"
-            startIcon={<CameraAltIcon />}
-            onClick={handleOpenCamera}
-          >
-            Open Camera
-          </Button>
-        ) : roomData?.offerId === currentUser.id ? (
+        <Box className="flex justify-center items-center gap-4">
+          <IconButton variant="contained" onClick={handleOpenCamera}>
+            {webcamActive ? <CameraAltIcon /> : <NoPhotographyIcon />}
+          </IconButton>
+          <IconButton variant="contained" onClick={handleOpenMic}>
+            {micActive ? <MicIcon /> : <MicOffIcon />}
+          </IconButton>
           <ReactMediaRecorder
             screen
             render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
               <>
                 {status === 'idle' && (
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<EmergencyRecordingIcon />}
-                    onClick={startRecording}
-                  >
-                    Start Recording
-                  </Button>
+                  <IconButton variant="contained" onClick={startRecording}>
+                    <EmergencyRecordingIcon />
+                  </IconButton>
                 )}
                 {status === 'recording' && (
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<RadioButtonCheckedIcon />}
-                    onClick={stopRecording}
-                  >
-                    Stop Recording
-                  </Button>
+                  <IconButton variant="contained" onClick={stopRecording}>
+                    <RadioButtonCheckedIcon />
+                  </IconButton>
                 )}
                 {status === 'stopped' && (
-                  <Button
+                  <IconButton
                     fullWidth
                     variant="contained"
-                    startIcon={
-                      loading ? (
-                        <CircularProgress color="textDefault" size={14} />
-                      ) : (
-                        <UploadFileIcon />
-                      )
-                    }
                     onClick={() => handleUpload(mediaBlobUrl)}
                   >
-                    Upload Record
-                  </Button>
+                    {loading ? (
+                      <CircularProgress color="textDefault" size={14} />
+                    ) : (
+                      <UploadFileIcon />
+                    )}
+                  </IconButton>
                 )}
               </>
             )}
           />
-        ) : (
-          <Box></Box>
-        )}
+          <IconButton variant="contained" onClick={handleLeaveRoom}>
+            <LogoutIcon />
+          </IconButton>
+        </Box>
       </Box>
     </Box>
   )

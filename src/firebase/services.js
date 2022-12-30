@@ -4,6 +4,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -29,21 +30,31 @@ export const addDocument = async document => {
 }
 
 export const getDocument = async (document, condition) => {
-  let ref = collection(db, document.collectionName)
+  let ref = null
+  let res = null
   if (document.id) {
-    ref = doc(ref, document.id)
+    ref = doc(db, document.collectionName, String(document.id))
+    res = await getDoc(ref)
+    if (res.data()) {
+      return {
+        ...res.data()
+      }
+    }
+  } else {
+    ref = collection(db, document.collectionName)
+    if (condition) {
+      ref = query(ref, where(condition.fieldName, condition.operator, condition.compareValue))
+    }
+    res = await getDocs(ref)
+    if (res) {
+      const returnRes = res.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id
+      }))
+      return returnRes
+    }
   }
-  if (condition) {
-    ref = query(ref, where(condition.fieldName, condition.operator, condition.compareValue))
-  }
-  const res = await getDocs(ref)
-  if (res) {
-    const returnRes = res.docs.map(doc => ({
-      ...doc.data(),
-      id: doc.id
-    }))
-    return returnRes
-  }
+  return null
 }
 
 export const deleteDocument = async document => {
