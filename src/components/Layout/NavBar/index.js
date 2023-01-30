@@ -11,16 +11,15 @@ import {
 } from '@mui/material'
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import AccountCircle from '@mui/icons-material/AccountCircle'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { deleteFromWatchinglist } from '~/pages/VideoDetail/videosSlice'
 import useFirestore from '~/hooks/useFirestore'
 import { deleteDocument, getDocument } from '~/firebase/services'
-import Achievement from './Achievement'
-import { useGetCurrentPointQuery } from './Achievement/achievementsSlice'
-import images from '~/assets/images'
 import { deleteRoomChat } from '~/pages/RoomChat/roomChatSlice'
+import UserMenu from './UserMenu'
+import Achievement from '../Achievement'
+import { useGetCurrentPointQuery } from '../Achievement/achievementsSlice'
 
 export default function NavBar() {
   const dispatch = useDispatch()
@@ -171,9 +170,7 @@ export default function NavBar() {
               </MenuItem>
             ))}
           </Menu>
-          <IconButton size="large" edge="end" color="inherit">
-            <AccountCircle />
-          </IconButton>
+          <UserMenu />
         </Box>
       </Toolbar>
     </AppBar>
