@@ -1,3 +1,5 @@
 export { default as VideoCard } from './VideoCard'
 export { default as RecordCard } from './RecordCard'
 export { default as FilterArea } from './FilterArea'
+export { default as ButtonPopover } from './ButtonPopover'
+export { default as FlexBetween } from './FlexBetween'

@@ -8,4 +8,12 @@ const RequireAuth = () => {
 
   return token ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />
 }
+
+export const LoggedIn = () => {
+  const token = getCookie('token')
+  const location = useLocation()
+
+  return token ? <Navigate to="/" state={{ from: location }} replace /> : <Outlet />
+}
+
 export default RequireAuth
