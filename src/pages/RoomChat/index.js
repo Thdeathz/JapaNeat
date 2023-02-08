@@ -4,9 +4,9 @@ import ChatBox from './ChatBox'
 import VideoControl from './VideoControl'
 import VideoCall from './VideoCall'
 import { selectVideoById, useGetVideosQuery } from '../VideoDetail/videosSlice'
-import { Loading } from '~/components/Layout'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { Loading } from '~/components'
 
 export default function RoomChat() {
   const { videoId } = useParams()

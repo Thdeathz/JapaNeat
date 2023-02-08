@@ -10,10 +10,10 @@ import {
   Tab,
   Tabs
 } from '@mui/material'
-import BackgroundMusic from '../../BackgroundMusic'
-import Theme from '../../Theme'
-import FloatButton from '../../FloatButton'
 import { toast } from 'react-toastify'
+import BackgroundMusic from '../BackgroundMusic'
+import FloatButton from '~/components/FloatButton'
+import Theme from '../Theme'
 
 function SettingModal({ openModal, setOpenModal }) {
   const currentAchievement = JSON.parse(localStorage.getItem('currentAchievements'))

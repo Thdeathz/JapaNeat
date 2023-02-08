@@ -1,61 +1,40 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
+import { ChatBubbleOutlined, InfoOutlined, PeopleAltOutlined } from '@mui/icons-material'
 import {
-  Avatar,
-  Badge,
   Box,
   Button,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogTitle,
-  List,
-  ListItem,
   Slide,
   Snackbar,
-  Stack
+  Typography
 } from '@mui/material'
-import { styled } from '@mui/material/styles'
-import CameraIndoorIcon from '@mui/icons-material/CameraIndoor'
-import { v4 } from 'uuid'
-import images from '~/assets/images'
-import { getDocument } from '~/firebase/services'
+import { ChatBox, FlexBetween, IconButton } from '~/components'
+import VideoInfo from './VideoInfo'
+import WatchingList from './WatchingList'
 import useFirestore from '~/hooks/useFirestore'
-import { deleteFromWatchinglist } from './videosSlice'
-import { changeRoomStatus, sendOffer } from '../RoomChat/roomChatSlice'
-import AccountCircle from '@mui/icons-material/AccountCircle'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { changeRoomStatus, sendOffer } from '~/pages/RoomChat/roomChatSlice'
+import { v4 } from 'uuid'
+import { getDocument } from '~/firebase/services'
 
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  '& .MuiBadge-badge': {
-    backgroundColor: '#44b700',
-    color: '#44b700',
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    '&::after': {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      borderRadius: '50%',
-      animation: 'ripple 1.2s infinite ease-in-out',
-      border: '1px solid currentColor',
-      content: '""'
-    }
-  }
-}))
-
-export default function WatchingList() {
-  const navigate = useNavigate()
-  const { videoId } = useParams()
+function RightMenu({ videoDetail }) {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const { videoId } = useParams()
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
 
-  const [openToast, setOpenToast] = useState(false)
+  const [currentTab, setCurrentTab] = useState('chat')
   const [openModal, setOpenModal] = useState(true)
+  const [openToast, setOpenToast] = useState(false)
 
   const watchingList = useFirestore(`watchings/${videoId}/members`)
-
+  const messageList = useFirestore(`watchings/${videoId}/messages`)
   const offerList = useFirestore(`watchings/${videoId}/rooms`)
 
   const handleSendOffer = async answerData => {
@@ -93,12 +72,6 @@ export default function WatchingList() {
         videoId: roomData.videoId
       })
     )
-    dispatch(
-      deleteFromWatchinglist({
-        videoId: videoId,
-        userData: currentUserData
-      })
-    )
     navigate(`/room/${videoId}/${roomData.roomId}`)
   }
 
@@ -110,11 +83,15 @@ export default function WatchingList() {
       }
     }
 
-    return handleOfferNavigate()
-  }, [currentUserData, offerList])
+    handleOfferNavigate()
+
+    return () => {}
+  }, [offerList])
 
   return (
     <>
+      {console.log('re-render right menu')}
+      {/* WATTING TOAST */}
       <Snackbar
         open={openToast}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -127,6 +104,8 @@ export default function WatchingList() {
         }
         key={currentUserData.id}
       />
+
+      {/* ACEPT INVITE MODAL */}
       {offerList?.map(
         (room, index) =>
           room.answerId === Number(currentUserData.id) &&
@@ -152,38 +131,70 @@ export default function WatchingList() {
             </Dialog>
           )
       )}
-      <p className="text-center font-semibold text-2xl py-2 text-cardHeadline bg-cardBackground">
-        Watching
-      </p>
-      <List component="div">
-        {watchingList ? (
-          watchingList.map(
-            user =>
-              Number(user.id) !== currentUserData.id && (
-                <ListItem key={user.id} button onClick={() => handleSendOffer(user)}>
-                  <Stack
-                    className="w-full"
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <StyledBadge
-                      overlap="circular"
-                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                      variant="dot"
-                    >
-                      <AccountCircle />
-                    </StyledBadge>
-                    <h4 className="ml-4 text-xl text-default">{user?.userName}</h4>
-                    <CameraIndoorIcon />
-                  </Stack>
-                </ListItem>
-              )
-          )
-        ) : (
-          <p>Get watching list</p>
-        )}
-      </List>
+
+      {/* RIGHT MENU CONTENT */}
+      <FlexBetween flexDirection="column" className="bg-secondary w-full h-full">
+        <FlexBetween className="bg-white p-3 w-full h-[6vh]">
+          <Typography variant="h6">
+            {currentTab === 'people'
+              ? `Watching List`
+              : currentTab === 'chat'
+              ? 'Chat'
+              : 'Infomation'}
+          </Typography>
+
+          <FlexBetween gap="0.5rem">
+            <IconButton
+              textDetail="People"
+              style={{ fontSize: '1rem' }}
+              isActive={currentTab === 'people'}
+              handleOnClick={() => setCurrentTab('people')}
+            >
+              <PeopleAltOutlined
+                sx={{ fontSize: '1.5rem', color: currentTab === 'people' && '#6aa6fa' }}
+              />
+            </IconButton>
+
+            <IconButton
+              textDetail="Chat"
+              style={{ fontSize: '1rem' }}
+              isActive={currentTab === 'chat'}
+              handleOnClick={() => setCurrentTab('chat')}
+            >
+              <ChatBubbleOutlined
+                sx={{ fontSize: '1.5rem', color: currentTab === 'chat' && '#6aa6fa' }}
+              />
+            </IconButton>
+
+            <IconButton
+              textDetail="More info"
+              style={{ fontSize: '1rem' }}
+              isActive={currentTab === 'info'}
+              handleOnClick={() => setCurrentTab('info')}
+            >
+              <InfoOutlined
+                sx={{ fontSize: '1.5rem', color: currentTab === 'info' && '#6aa6fa' }}
+              />
+            </IconButton>
+          </FlexBetween>
+        </FlexBetween>
+
+        <Box className="w-full h-[94vh]">
+          {currentTab === 'people' ? (
+            <WatchingList watchingList={watchingList} handleSendOffer={handleSendOffer} />
+          ) : currentTab === 'chat' ? (
+            <ChatBox collectionName={`watchings/${videoId}/messages`} messageList={messageList} />
+          ) : (
+            <VideoInfo videoDetail={videoDetail} />
+          )}
+        </Box>
+      </FlexBetween>
     </>
   )
 }
+
+RightMenu.propTypes = {
+  videoDetail: PropTypes.object.isRequired
+}
+
+export default React.memo(RightMenu)

@@ -1,25 +1,17 @@
 import React, { useState } from 'react'
-import {
-  AppBar,
-  Badge,
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
-  Toolbar,
-  Typography
-} from '@mui/material'
+import { Badge, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { deleteFromWatchinglist } from '~/pages/VideoDetail/videosSlice'
 import useFirestore from '~/hooks/useFirestore'
 import { deleteDocument, getDocument } from '~/firebase/services'
 import { deleteRoomChat } from '~/pages/RoomChat/roomChatSlice'
 import UserMenu from './UserMenu'
-import Achievement from '../Achievement'
-import { useGetCurrentPointQuery } from '../Achievement/achievementsSlice'
+import images from '~/assets/images'
+import FlexBetween from '~/components/FlexBetween'
+import Achievement from './Achievement'
+import { useGetCurrentPointQuery } from './Achievement/achievementsSlice'
 
 export default function NavBar() {
   const dispatch = useDispatch()
@@ -42,20 +34,6 @@ export default function NavBar() {
   })
 
   const handleLeaveRoom = async () => {
-    if (videoId) {
-      const checkCurrentWatchingVideo = await getDocument({
-        collectionName: `watchings/${videoId}/members`,
-        id: currentUserData.id
-      })
-      if (checkCurrentWatchingVideo) {
-        dispatch(
-          deleteFromWatchinglist({
-            videoId: videoId,
-            userData: currentUserData
-          })
-        )
-      }
-    }
     if (roomId) {
       const checkCurrentRoom = await getDocument({
         collectionName: `watchings/${videoId}/rooms`,
@@ -88,11 +66,19 @@ export default function NavBar() {
   }
 
   return (
-    <AppBar position="sticky">
+    <Box className="sticky top-0 z-50 bg-white border-b-[1px] border-[rgba(0,0,0,0.15)]">
       <Toolbar className="flex justify-center">
-        <Typography className="absolute left-[24px]" variant="h6" noWrap component="div">
-          <Link to="/">JapaNeat</Link>
-        </Typography>
+        <FlexBetween
+          className="absolute left-[24px] cursor-pointer"
+          gap="0.5rem"
+          onClick={() => navigate('/')}
+        >
+          <img src={images.logo} alt="logo" width={40} />
+          <Typography variant="h6" color="#6aa6fa" noWrap component="div">
+            JapaNeat
+          </Typography>
+        </FlexBetween>
+
         <Box
           className="flex flex-row justify-center items-center gap-16"
           sx={{ display: { xs: 'none', md: 'flex' } }}
@@ -114,6 +100,7 @@ export default function NavBar() {
             Ranking
           </Link>
         </Box>
+
         <Box className="absolute right-[24px]">
           {!pointLoading && currentUserData.role === 1 && (
             <>
@@ -140,11 +127,13 @@ export default function NavBar() {
               </Menu>
             </>
           )}
+
           <IconButton size="large" color="inherit" onClick={handleOpenNotifications}>
             <Badge badgeContent={Number(notifications.length)} color="error">
               <NotificationsIcon />
             </Badge>
           </IconButton>
+
           <Menu
             sx={{ mt: '45px' }}
             id="menu-notifications"
@@ -173,6 +162,6 @@ export default function NavBar() {
           <UserMenu />
         </Box>
       </Toolbar>
-    </AppBar>
+    </Box>
   )
 }

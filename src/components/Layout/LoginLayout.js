@@ -18,7 +18,7 @@ function LoginLayout({ children }) {
         >
           <img
             className="sm:w-[35%] w-[50%] md:absolute md:top-4"
-            src={images.logo}
+            src={images.appLogo}
             alt="App Logo"
           />
           {children}

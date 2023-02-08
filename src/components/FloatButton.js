@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
 import { Box, Button, Grid } from '@mui/material'
-import { selectAllAchievements } from './Achievement/achievementsSlice'
+import { selectAllAchievements } from './NavBar/Achievement/achievementsSlice'
 
 function FloatButton({ currentAchievement, setting, setSetting }) {
   const floatButton = useSelector(selectAllAchievements)?.filter(

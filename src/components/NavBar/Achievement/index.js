@@ -1,8 +1,8 @@
 import { Box, Tab, Tabs } from '@mui/material'
 import React, { useState } from 'react'
-import BackgroundMusic from '../BackgroundMusic'
-import FloatButton from '../FloatButton'
-import Theme from '../Theme'
+import FloatButton from '~/components/FloatButton'
+import BackgroundMusic from '~/components/RightBar/BackgroundMusic'
+import Theme from '~/components/RightBar/Theme'
 import { useGetAchievementsQuery } from './achievementsSlice'
 
 export default function Achievement() {

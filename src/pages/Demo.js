@@ -1,5 +1,5 @@
 import React from 'react'
-import { Loading } from '~/components/Layout'
+import { Loading } from '~/components'
 
 export default function Demo() {
   return (

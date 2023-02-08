@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Box, Button, Card, CardActionArea, Grid, Paper } from '@mui/material'
-import { selectAllAchievements } from './Achievement/achievementsSlice'
+import { selectAllAchievements } from '../NavBar/Achievement/achievementsSlice'
 
 function Theme({ currentAchievement, setting, setSetting }) {
   const achievements = useSelector(selectAllAchievements)?.filter(

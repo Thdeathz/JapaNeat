@@ -152,6 +152,8 @@ function VideoCall({ video }) {
         toastId: 1
       })
     }
+
+    return () => {}
   }, [videoId, roomId, ready, tracks, roomData])
 
   return (
