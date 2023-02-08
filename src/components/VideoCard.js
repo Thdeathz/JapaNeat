@@ -1,25 +1,30 @@
 import { Box, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material'
-import React from 'react'
+import React, { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
 import { PropTypes } from 'prop-types'
 import { useSelector } from 'react-redux'
+import useHoverDelay from '~/hooks/useHoverDelay'
 import { selectVideoById } from '~/pages/VideoDetail/videosSlice'
 
 function VideoCard({ videoId }) {
   const navigate = useNavigate()
   const video = useSelector(state => selectVideoById(state, Number(videoId)))
 
+  const cardRef = useRef(null)
+  const isHover = useHoverDelay(cardRef)
+
   return (
-    <Card sx={{ maxWidth: 280 }}>
+    <Card
+      className={isHover ? 'absolute top-[-10%] left-[-10%] w-[120%] h-[120%] z-10' : 'w-full'}
+      ref={cardRef}
+    >
       <CardActionArea onClick={() => navigate(`/video/${videoId}`)}>
-        <Box className="min-w-[280px] bg-secondary flex justify-center">
-          <img className="h-[200px] object-contain" src={video.video.thumbnail} alt="video" />
-        </Box>
+        <CardMedia component="img" image={video.video.thumbnail} alt="video thumbnail" />
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
-            <Typography variant="h5" component="p">
+            <Typography variant="h5" component="p" sx={{ fontWeight: '500' }}>
               {video.title}
             </Typography>
             <Typography component="p">23m views</Typography>

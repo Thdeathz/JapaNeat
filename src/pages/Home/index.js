@@ -3,8 +3,8 @@ import { Box } from '@mui/material'
 import VideoList from './VideoList'
 import RecordList from './RecordList'
 import { useGetVideosQuery } from '../VideoDetail/videosSlice'
-import { Loading } from '~/components/Layout'
 import { useGetRecordsQuery } from '../RecordDetail/recordsSlice'
+import { Loading } from '~/components'
 
 export default function Home() {
   const { isLoading: videoLoading } = useGetVideosQuery()
@@ -12,6 +12,7 @@ export default function Home() {
 
   return (
     <>
+      {console.log('==> re-render')}
       {videoLoading || recordLoading ? (
         <Loading />
       ) : (

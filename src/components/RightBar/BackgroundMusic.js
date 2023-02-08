@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Avatar, Box, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material'
-import { selectAllAchievements } from './Achievement/achievementsSlice'
+import { selectAllAchievements } from '../NavBar/Achievement/achievementsSlice'
 
 function BackgroundMusic({ currentAchievement, setting, setSetting }) {
   const achievements = useSelector(selectAllAchievements)?.filter(

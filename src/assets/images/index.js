@@ -1,5 +1,6 @@
 const images = {
-  logo: require('./JapaNeat-app-logo.png'),
+  appLogo: require('./JapaNeat-app-logo.png'),
+  logo: require('./logo-only.png'),
   demoImage: require('./Demo.png'),
   loginThumbnail: require('./login_thumbnail.jpg')
 }

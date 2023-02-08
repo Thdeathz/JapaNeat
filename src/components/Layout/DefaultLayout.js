@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import NavBar from './NavBar'
 import { Box, Stack } from '@mui/material'
-import { RightBar } from './RightBar'
+import NavBar from '../NavBar'
+import RightBar from '../RightBar'
 
 function DefaultLayout({ children }) {
   const currentUser = JSON.parse(localStorage.getItem('currentUser'))

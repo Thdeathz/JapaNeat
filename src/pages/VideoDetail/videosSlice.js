@@ -35,7 +35,16 @@ export const addToWatchinglist = createAsyncThunk('videos/addWatchinglist', asyn
         userName: initialState.userData.name
       }
     })
-    return initialState.videoId
+
+    await addDocument({
+      collectionName: `watchings/${initialState.videoId}/messages`,
+      id: initialState.userData.id,
+      data: {
+        userId: -999,
+        userName: initialState.userData.name,
+        message: ` has joined the room 👋`
+      }
+    })
   } catch (error) {
     console.log(error)
   }
@@ -49,8 +58,18 @@ export const deleteFromWatchinglist = createAsyncThunk(
         collectionName: `watchings/${initialState.videoId}/members`,
         id: initialState.userData.id
       })
+
+      await addDocument({
+        collectionName: `watchings/${initialState.videoId}/messages`,
+        id: initialState.userData.id,
+        data: {
+          userId: -999,
+          userName: initialState.userData.name,
+          message: ` has leave the room 🏍️`
+        }
+      })
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 )

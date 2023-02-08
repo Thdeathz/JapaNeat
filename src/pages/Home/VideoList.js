@@ -13,7 +13,7 @@ export default function VideoList() {
       <FilterArea type="Videos" />
       <Grid className="gap-6 desktop:max-w-[1200px] max-w-[904px]" container>
         {videosIds?.map(videoId => (
-          <Grid key={videoId} item>
+          <Grid key={`video-list-${videoId}`} item className="relative w-[280px] cursor-pointer">
             <VideoCard videoId={videoId} />
           </Grid>
         ))}

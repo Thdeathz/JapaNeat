@@ -3,7 +3,7 @@ import { apiSlice } from '~/api/apiSlice'
 import authReducer from '~/pages/Auth/authSlice'
 import videosReducer from '~/pages/VideoDetail/videosSlice'
 import roomChatReducer from '~/pages/RoomChat/roomChatSlice'
-import achievementsReducer from '~/components/Layout/Achievement/achievementsSlice'
+import achievementsReducer from '~/components/NavBar/Achievement/achievementsSlice'
 
 const store = configureStore({
   reducer: {

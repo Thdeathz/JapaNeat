@@ -1,12 +1,12 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
-import { DefaultLayout } from './components/Layout'
 import RequireAuth, { LoggedIn } from './pages/Auth/RequireAuth'
 import { privateRoutes, publicRoutes } from './router'
 import 'react-toastify/dist/ReactToastify.css'
 import { Box, ThemeProvider } from '@mui/material'
 import { theme } from './app/theme'
+import { DefaultLayout } from './components/Layout'
 
 function App() {
   const style = localStorage.getItem('cursor')
