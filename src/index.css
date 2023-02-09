@@ -26,3 +26,7 @@ body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+#video-call > div, #video-call > div > video{
+  border-radius: 0.5rem;
+}
