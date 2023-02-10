@@ -13,6 +13,9 @@ function IconButton({ children, textDetail, style, handleOnClick, isActive = fal
       sx={{
         p: '0.5rem',
         borderRadius: '0.25rem',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
         '&:hover': {
           backgroundColor: 'rgba(0, 0, 0, 0.15)'
         }

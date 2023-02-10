@@ -206,9 +206,9 @@ function VideoCallControl({ client, tracks, videoData, roomData }) {
 
 VideoCallControl.propTypes = {
   client: PropTypes.object.isRequired,
-  tracks: PropTypes.array.isRequired,
+  tracks: PropTypes.array,
   videoData: PropTypes.object.isRequired,
-  roomData: PropTypes.object.isRequired
+  roomData: PropTypes.any.isRequired
 }
 
 export default React.memo(VideoCallControl)

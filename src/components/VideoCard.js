@@ -17,7 +17,7 @@ function VideoCard({ videoId }) {
 
   return (
     <Card
-      className={isHover ? 'absolute top-[-10%] left-[-10%] w-[120%] h-[120%] z-10' : 'w-full'}
+      className={isHover ? 'absolute top-[-10%] left-[-10%] w-[120%] h-[120%] z-50' : 'w-full'}
       ref={cardRef}
     >
       <CardActionArea onClick={() => navigate(`/video/${videoId}`)}>

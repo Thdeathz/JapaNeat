@@ -19,6 +19,9 @@ export const theme = createTheme({
     },
     navBackground: {
       main: '#bae8e8'
+    },
+    textPrimary: {
+      main: '#6aa6fa'
     }
   }
 })

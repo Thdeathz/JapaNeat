@@ -32,6 +32,9 @@ const ButtonPopover = ({ button, children, style }) => {
         placement="top-end"
         transition
         disablePortal
+        sx={{
+          zIndex: 999
+        }}
       >
         {({ TransitionProps }) => (
           <Grow

@@ -4,7 +4,7 @@ import { getCookie } from '~/hooks/getCookie'
 const baseQuery = fetchBaseQuery({
   baseUrl: 'http://127.0.0.1:8000/api',
   // baseUrl: 'https://japaneat.herokuapp.com/api',
-  keepUnusedDataFor: '30s',
+  keepUnusedDataFor: '60s',
   prepareHeaders: headers => {
     headers.set('Content-Type', 'application/json')
     const token = getCookie('token')

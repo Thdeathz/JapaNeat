@@ -1,26 +1,5 @@
 import React from 'react'
-import { Box } from '@mui/material'
-import VideoList from './VideoList'
-import RecordList from './RecordList'
-import { useGetVideosQuery } from '../VideoDetail/videosSlice'
-import { useGetRecordsQuery } from '../RecordDetail/recordsSlice'
-import { Loading } from '~/components'
 
 export default function Home() {
-  const { isLoading: videoLoading } = useGetVideosQuery()
-  const { isLoading: recordLoading } = useGetRecordsQuery()
-
-  return (
-    <>
-      {console.log('==> re-render')}
-      {videoLoading || recordLoading ? (
-        <Loading />
-      ) : (
-        <Box className="flex flex-col justify-center items-center gap-24">
-          <VideoList />
-          <RecordList />
-        </Box>
-      )}
-    </>
-  )
+  return <></>
 }
