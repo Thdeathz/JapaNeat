@@ -16,12 +16,17 @@ function VideoCard({ videoId }) {
   const isHover = useHoverDelay(cardRef)
 
   return (
-    <Card
-      className={isHover ? 'absolute top-[-10%] left-[-10%] w-[120%] h-[120%] z-50' : 'w-full'}
-      ref={cardRef}
-    >
+    <Card className={'w-full'} ref={cardRef}>
       <CardActionArea onClick={() => navigate(`/video/${videoId}`)}>
-        <CardMedia component="img" image={video.video.thumbnail} alt="video thumbnail" />
+        {isHover ? (
+          <Box className="h-full">
+            <video className="h-full" autoPlay>
+              <source src={video.video.url} type="video/mp4" />
+            </video>
+          </Box>
+        ) : (
+          <CardMedia component="img" image={video.video.thumbnail} alt="video thumbnail" />
+        )}
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
             <Typography variant="h5" component="p" sx={{ fontWeight: '500' }}>

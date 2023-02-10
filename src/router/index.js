@@ -1,5 +1,15 @@
 // Pages
-import { Login, Home, VideoDetail, RoomChat, RecordDetail, Demo, Records, Videos } from '~/pages'
+import {
+  Login,
+  Home,
+  VideoDetail,
+  RoomChat,
+  RecordDetail,
+  Demo,
+  Records,
+  Videos,
+  Ranking
+} from '~/pages'
 
 // Layout
 import { DefaultLayout, BackArrowLayout, LoginLayout, NoLayout } from '~/components/Layout'
@@ -14,7 +24,8 @@ const privateRoutes = [
   { path: '/video/:videoId', component: VideoDetail, layout: BackArrowLayout },
   { path: '/room/:videoId/:roomId', component: RoomChat, layout: NoLayout },
   { path: '/records', component: Records, layout: DefaultLayout },
-  { path: '/record/:recordId', component: RecordDetail, layout: DefaultLayout }
+  { path: '/record/:recordId', component: RecordDetail, layout: DefaultLayout },
+  { path: '/ranking', component: Ranking, layout: DefaultLayout }
 ]
 
 export { publicRoutes, privateRoutes }

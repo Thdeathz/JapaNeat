@@ -61,7 +61,7 @@ function VideoCallControl({ client, tracks, videoData, roomData }) {
         roomId: roomId
       })
     )
-    navigate('/')
+    navigate('/videos')
   }
 
   const handleUpload = async mediaBlobUrl => {
