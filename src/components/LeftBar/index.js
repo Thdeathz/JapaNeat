@@ -100,7 +100,7 @@ function LeftBar() {
 
       <Divider sx={{ width: '100%' }} />
 
-      {currentUser.role == '1' && (
+      {currentUser.role == '0' && (
         <LeftBarButtton title="Upload">
           <UploadFile color={false ? 'textPrimary' : 'black'} sx={{ fontSize: '1.5rem' }} />
         </LeftBarButtton>
