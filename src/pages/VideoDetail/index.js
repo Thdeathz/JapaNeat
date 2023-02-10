@@ -50,7 +50,6 @@ export default function VideoDetail() {
         <Loading />
       ) : (
         <>
-          {console.log('==> re render video detail')}
           <Box className="w-screen h-screen flex lg:flex-row flex-col">
             <video className="lg:w-[75vw] w-full h-screen bg-black hover:cursor-pointer" controls>
               <source src={video.video.url} type="video/mp4" />

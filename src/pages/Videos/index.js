@@ -18,9 +18,9 @@ function Videos() {
           <FilterArea />
           <Box className="flex flex-col justify-center items-start px-2">
             <Grid className="lg:gap-4 gap-2" container>
-              {videosIds?.map(videoId => (
+              {videosIds?.map((videoId, index) => (
                 <Grid
-                  key={`video-list-${videoId}`}
+                  key={`video-list-${videoId}-${index}`}
                   item
                   className="2xl:w-[260px] xl:w-[23%] md:w-[32%] sm:w-[45%] w-full cursor-pointer relative"
                 >

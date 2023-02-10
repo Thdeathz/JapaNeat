@@ -35,7 +35,7 @@ export default function LoginEmail() {
       toast.success('Login successfully', {
         toastId: 99
       })
-      navigate('/')
+      navigate('/videos')
     } catch (error) {
       toast.error('Invaild email or password', {
         toastId: 1

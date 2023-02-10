@@ -60,7 +60,7 @@ export default function RoomChat() {
       client.removeAllListeners()
       tracks[0].close()
       tracks[1].close()
-      navigate('/')
+      navigate('/videos')
     }
 
     if (ready && tracks) {

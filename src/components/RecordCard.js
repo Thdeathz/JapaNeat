@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux'
 import { selectRecordById } from '~/pages/RecordDetail/recordsSlice'
 import { useNavigate } from 'react-router-dom'
 import { selectVideoById } from '~/pages/VideoDetail/videosSlice'
+import { MissedVideoCall } from '@mui/icons-material'
 
 function RecordCard({ recordId }) {
   const navigate = useNavigate()
@@ -31,7 +32,7 @@ function RecordCard({ recordId }) {
                 {video?.category}
               </Typography>
               <Typography component="p">
-                <PersonIcon /> {record.offer.name}
+                <MissedVideoCall /> {record.offer.name}
               </Typography>
             </Box>
             <Box className="text-right">

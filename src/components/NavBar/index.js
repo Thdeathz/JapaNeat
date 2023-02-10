@@ -73,12 +73,11 @@ function NavBar() {
   const handleNavigateToRecordDetail = async (recordId, notiId) => {
     setAnchorElNotifications(false)
     navigate(`/record/${recordId}`)
-    if (currentUserData.role === 1) {
-      await deleteDocument({
-        collectionName: 'notifications',
-        id: notiId
-      })
-    }
+
+    await deleteDocument({
+      collectionName: 'notifications',
+      id: notiId
+    })
   }
 
   return (
