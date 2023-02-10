@@ -1,6 +1,8 @@
 export { default as Demo } from './Demo'
 export { default as Login } from './Auth/Login'
 export { default as Home } from './Home'
+export { default as Videos } from './Videos'
 export { default as VideoDetail } from './VideoDetail'
 export { default as RoomChat } from './RoomChat'
+export { default as Records } from './Records'
 export { default as RecordDetail } from './RecordDetail'

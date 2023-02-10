@@ -135,7 +135,10 @@ function RightMenu({ videoDetail }) {
       {/* RIGHT MENU CONTENT */}
       <FlexBetween flexDirection="column" className="bg-secondary w-full h-full">
         <FlexBetween className="bg-white p-3 w-full h-[6vh]">
-          <Typography variant="h6">
+          <Typography
+            variant="h6"
+            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
             {currentTab === 'people'
               ? `Watching List`
               : currentTab === 'chat'

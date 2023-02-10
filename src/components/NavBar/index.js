@@ -1,5 +1,16 @@
 import React, { useState } from 'react'
-import { Badge, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material'
+import {
+  Badge,
+  Button,
+  IconButton,
+  InputBase,
+  Menu,
+  MenuItem,
+  styled,
+  Toolbar,
+  Typography,
+  useMediaQuery
+} from '@mui/material'
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -12,11 +23,33 @@ import images from '~/assets/images'
 import FlexBetween from '~/components/FlexBetween'
 import Achievement from './Achievement'
 import { useGetCurrentPointQuery } from './Achievement/achievementsSlice'
+import SearchIcon from '@mui/icons-material/Search'
 
-export default function NavBar() {
-  const dispatch = useDispatch()
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+}))
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  borderRadius: '50px',
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%'
+  }
+}))
+
+function NavBar() {
   const navigate = useNavigate()
-  const { videoId, roomId } = useParams()
+  const isDesktopScreen = useMediaQuery('(min-width: 768px)')
+
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
   const { data: currentPoint, isLoading: pointLoading } = useGetCurrentPointQuery(
     currentUserData.id
@@ -32,23 +65,6 @@ export default function NavBar() {
       return noti.offerId === currentUserData.id || noti.answerId === currentUserData.id
     }
   })
-
-  const handleLeaveRoom = async () => {
-    if (roomId) {
-      const checkCurrentRoom = await getDocument({
-        collectionName: `watchings/${videoId}/rooms`,
-        id: roomId
-      })
-      if (checkCurrentRoom) {
-        dispatch(
-          deleteRoomChat({
-            videoId: videoId,
-            roomId: roomId
-          })
-        )
-      }
-    }
-  }
 
   const handleOpenNotifications = () => {
     if (notifications.length !== 0) setAnchorElNotifications(true)
@@ -66,42 +82,27 @@ export default function NavBar() {
   }
 
   return (
-    <Box className="sticky top-0 z-50 bg-white border-b-[1px] border-[rgba(0,0,0,0.15)]">
-      <Toolbar className="flex justify-center">
-        <FlexBetween
-          className="absolute left-[24px] cursor-pointer"
-          gap="0.5rem"
-          onClick={() => navigate('/')}
-        >
-          <img src={images.logo} alt="logo" width={40} />
-          <Typography variant="h6" color="#6aa6fa" noWrap component="div">
-            JapaNeat
-          </Typography>
+    <Box className="bg-white border-b-[1px] border-[rgba(0,0,0,0.15)] ">
+      <Toolbar className="flex justify-between items-center">
+        <FlexBetween gap="2rem">
+          <FlexBetween className="cursor-pointer" gap="0.5rem" onClick={() => navigate('/')}>
+            <img src={images.logo} alt="logo" width={40} />
+            <Typography variant="h6" color="#6aa6fa" noWrap component="div">
+              JapaNeat
+            </Typography>
+          </FlexBetween>
+
+          {isDesktopScreen && (
+            <Box className="relative bg-secondary mr-2 rounded-2xl">
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
+            </Box>
+          )}
         </FlexBetween>
 
-        <Box
-          className="flex flex-row justify-center items-center gap-16"
-          sx={{ display: { xs: 'none', md: 'flex' } }}
-        >
-          <Link
-            to="/"
-            className="text-xl font-medium text-default hover:text-textHover"
-            onClick={handleLeaveRoom}
-          >
-            Home
-          </Link>
-          <Link className="text-xl font-medium text-default hover:text-textHover" underline="none">
-            Videos
-          </Link>
-          <Link className="text-xl font-medium text-default hover:text-textHover" underline="none">
-            Records
-          </Link>
-          <Link className="text-xl font-medium text-default hover:text-textHover" underline="none">
-            Ranking
-          </Link>
-        </Box>
-
-        <Box className="absolute right-[24px]">
+        <Box className="right-[24px]">
           {!pointLoading && currentUserData.role === 1 && (
             <>
               <Button color="textDefault" onClick={() => setAnchorElPoint(true)}>
@@ -165,3 +166,5 @@ export default function NavBar() {
     </Box>
   )
 }
+
+export default React.memo(NavBar)

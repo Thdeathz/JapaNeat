@@ -1,22 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Box, Stack } from '@mui/material'
+import { Box } from '@mui/material'
 import NavBar from '../NavBar'
-import RightBar from '../RightBar'
+import FlexBetween from '../FlexBetween'
+import LeftBar from '../LeftBar'
 
 function DefaultLayout({ children }) {
-  const currentUser = JSON.parse(localStorage.getItem('currentUser'))
-
   return (
     <>
       <NavBar />
-      <Stack className="p-2 relative" direction="row" spacing={2} justifyContent="space-between">
-        <Box flex={1} color="secondary"></Box>
-        <Box flex={10}>{children}</Box>
-        <Box className="flex flex-col items-center gap-4" flex={1}>
-          {currentUser.role === 1 && <RightBar />}
+      <FlexBetween sx={{ alignItems: 'flex-start' }} className="bg-[white] lg:gap-4 gap-1 relative">
+        <Box className="lg:basis-2/12 sm:basis-1/12 basis-1/4 lg:px-4 px-1 pt-4 flex flex-col items-center gap-2 overflow-y-auto overflow-x-hidden sticky top-0">
+          <LeftBar />
         </Box>
-      </Stack>
+        <Box className="lg:basis-10/12 sm:basis-11/12 basis-3/4 w-full h-full">{children}</Box>
+      </FlexBetween>
     </>
   )
 }
