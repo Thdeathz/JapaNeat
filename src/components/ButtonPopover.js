@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 import { Box, ClickAwayListener, Grow, IconButton, Paper, Popper } from '@mui/material'
 
-// eslint-disable-next-line react/prop-types
-const ButtonPopover = ({ button, children, style }) => {
+function ButtonPopover({ button, children, style }) {
   const [isOpenMenu, setIsOpenMennu] = useState(false)
   const menuAnchorRef = useRef(null)
 
@@ -53,6 +53,12 @@ const ButtonPopover = ({ button, children, style }) => {
       </Popper>
     </>
   )
+}
+
+ButtonPopover.propTypes = {
+  button: PropTypes.element.isRequired,
+  children: PropTypes.element.isRequired,
+  style: PropTypes.object
 }
 
 export default React.memo(ButtonPopover)

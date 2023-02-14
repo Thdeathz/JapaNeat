@@ -74,7 +74,7 @@ export default function RoomChat() {
       })
     }
 
-    return async () => leaveRoom
+    return () => {}
   }, [videoId, roomId, ready, tracks, roomData])
 
   return (

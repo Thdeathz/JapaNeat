@@ -6,7 +6,7 @@ function MessageList({ sender, message }) {
   return (
     <Box display="flex" flexDirection="column" alignItems={sender ? 'flex-end' : 'flex-start'}>
       <Typography
-        className="bg-hightlight py-2 px-4 max-w-[20vw] rounded-lg"
+        className="bg-hightlight py-2 px-4 max-w-[80%] rounded-lg"
         sx={{ overflowWrap: 'break-word', backgroundColor: sender ? '#ffd803' : '#fffffe' }}
       >
         <span style={{ fontWeight: '700', color: '#6aa6fa' }}>{message.userName}</span>

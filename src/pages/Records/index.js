@@ -1,12 +1,10 @@
 import React from 'react'
 import { Box, Grid } from '@mui/material'
-import { useSelector } from 'react-redux'
 import { Loading, RecordCard } from '~/components'
-import { selectRecordIds, useGetRecordsQuery } from '../RecordDetail/recordsSlice'
+import { useGetRecordsQuery } from '../RecordDetail/recordsSlice'
 
 function Records() {
-  const { isLoading } = useGetRecordsQuery()
-  const recordIds = useSelector(selectRecordIds)
+  const { data: records, isLoading } = useGetRecordsQuery()
 
   return (
     <>
@@ -15,7 +13,7 @@ function Records() {
       ) : (
         <Box className="flex flex-col justify-center items-start px-2 py-4">
           <Grid className="lg:gap-4 gap-2" container>
-            {recordIds?.map(recordId => (
+            {records.ids.map(recordId => (
               <Grid
                 key={`record-list-${recordId}`}
                 item

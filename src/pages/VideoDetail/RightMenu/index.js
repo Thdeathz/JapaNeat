@@ -134,7 +134,7 @@ function RightMenu({ videoDetail }) {
 
       {/* RIGHT MENU CONTENT */}
       <FlexBetween flexDirection="column" className="bg-secondary w-full h-full">
-        <FlexBetween className="bg-white p-3 w-full h-[6vh]">
+        <FlexBetween className="bg-white p-3 w-full lg:h-[6%] h-[10%]">
           <Typography
             variant="h6"
             sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -182,7 +182,7 @@ function RightMenu({ videoDetail }) {
           </FlexBetween>
         </FlexBetween>
 
-        <Box className="w-full h-[94vh]">
+        <Box className="w-full lg:h-[94%] h-[90%]">
           {currentTab === 'people' ? (
             <WatchingList watchingList={watchingList} handleSendOffer={handleSendOffer} />
           ) : currentTab === 'chat' ? (

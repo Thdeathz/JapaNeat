@@ -7,13 +7,15 @@ import { PropTypes } from 'prop-types'
 import { useSelector } from 'react-redux'
 import useHoverDelay from '~/hooks/useHoverDelay'
 import { selectVideoById } from '~/pages/VideoDetail/videosSlice'
+import { useHover } from 'usehooks-ts'
 
 function VideoCard({ videoId }) {
   const navigate = useNavigate()
   const video = useSelector(state => selectVideoById(state, Number(videoId)))
 
   const cardRef = useRef(null)
-  const isHover = useHoverDelay(cardRef)
+  // const isHover = useHover(cardRef)
+  const isHover = false
 
   return (
     <Card className={'w-full'} ref={cardRef}>
