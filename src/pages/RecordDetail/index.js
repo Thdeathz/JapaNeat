@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextareaAutosize, Typography } from '@mui/material'
+import { Box, Button, InputBase, Stack, TextareaAutosize, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'

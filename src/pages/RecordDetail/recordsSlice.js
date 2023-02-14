@@ -1,4 +1,4 @@
-import { createEntityAdapter, createSelector } from '@reduxjs/toolkit'
+import { createDraftSafeSelector, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 import { apiSlice } from '~/api/apiSlice'
 
 const recordsAdapter = createEntityAdapter({})
@@ -24,6 +24,13 @@ export const recordsApiSlice = apiSlice.injectEndpoints({
         { type: 'Record', id: 'List' },
         ...result.ids.map(id => ({ type: 'Record', id }))
       ]
+    }),
+    getRecordsByVideoId: builder.query({
+      query: videoId => `/record_details?video_id=${videoId}`,
+      transformResponse: res => {
+        return recordsAdapter.setAll(initialState, res.data)
+      },
+      providesTags: (result, error, arg) => [...result.ids.map(id => ({ type: 'Record', id }))]
     }),
     addNewRecord: builder.mutation({
       query: initialRecord => ({
@@ -51,8 +58,12 @@ export const recordsApiSlice = apiSlice.injectEndpoints({
   })
 })
 
-export const { useGetRecordsQuery, useAddNewRecordMutation, useAddFeedbackMutation } =
-  recordsApiSlice
+export const {
+  useGetRecordsQuery,
+  useGetRecordsByVideoIdQuery,
+  useAddNewRecordMutation,
+  useAddFeedbackMutation
+} = recordsApiSlice
 
 export const selectRecordResult = recordsApiSlice.endpoints.getRecords.select()
 

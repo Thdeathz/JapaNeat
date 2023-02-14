@@ -1,13 +1,11 @@
 import React from 'react'
 import { Box, Grid } from '@mui/material'
-import { useSelector } from 'react-redux'
 import { Loading, VideoCard } from '~/components'
-import { selectVideoIds, useGetVideosQuery } from '../VideoDetail/videosSlice'
+import { useGetVideosQuery } from '../VideoDetail/videosSlice'
 import FilterArea from './FilterArea'
 
 function Videos() {
-  const { isLoading } = useGetVideosQuery()
-  const videosIds = useSelector(selectVideoIds)
+  const { data: videos, isLoading } = useGetVideosQuery()
 
   return (
     <>
@@ -16,9 +14,9 @@ function Videos() {
       ) : (
         <>
           <FilterArea />
-          <Box className="flex flex-col justify-center items-start px-2">
+          <Box className="flex flex-col justify-center items-start px-2 pb-4">
             <Grid className="lg:gap-4 gap-2" container>
-              {videosIds?.map((videoId, index) => (
+              {videos.ids.map((videoId, index) => (
                 <Grid
                   key={`video-list-${videoId}-${index}`}
                   item

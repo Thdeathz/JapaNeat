@@ -27,7 +27,7 @@ function ChatBox({ collectionName, messageList }) {
         {messageList.map((message, index) => (
           <Box key={`message-list-${index}`}>
             {message.userId === -999 ? (
-              <Box className="bg-cardHeadline max-w-[20vw] py-2 px-4 rounded-lg">
+              <Box className="bg-cardHeadline max-w-[90%] py-2 px-4 rounded-lg">
                 <Typography sx={{ fontWeight: '700', color: '#6aa6fa' }}>🤖 Admin</Typography>
                 <Typography>
                   <span style={{ fontWeight: '500' }}>{message.userName}</span> {message.message}
