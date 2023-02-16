@@ -30,12 +30,14 @@ function RightMenu({ videoDetail }) {
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
 
   const [currentTab, setCurrentTab] = useState('chat')
-  const [openModal, setOpenModal] = useState(true)
+  const [openKaiwaModal, setOpenKaiwaModal] = useState(true)
+  const [openDualModal, setOpenDualModal] = useState(true)
   const [openToast, setOpenToast] = useState(false)
 
   const watchingList = useFirestore(`watchings/${videoId}/members`)
   const messageList = useFirestore(`watchings/${videoId}/messages`)
-  const offerList = useFirestore(`watchings/${videoId}/rooms`)
+  const offerKaiwaList = useFirestore(`watchings/${videoId}/rooms`)
+  const offerDualList = useFirestore(`dual`)
 
   const handleSendOffer = async answerData => {
     if (currentUserData) {
@@ -53,6 +55,7 @@ function RightMenu({ videoDetail }) {
       if (!checkAdded.find(room => room.answerId === Number(answerData.id))) {
         dispatch(
           sendOffer({
+            collectionName: `watchings/${videoId}/rooms`,
             roomId: v4(),
             videoId: Number(videoId),
             offerId: Number(currentUserData.id),
@@ -65,9 +68,41 @@ function RightMenu({ videoDetail }) {
     }
   }
 
-  const handleAccept = async roomData => {
+  const handleStartBattle = async answerData => {
+    if (currentUserData) {
+      setOpenToast(true)
+      const checkAdded = await getDocument(
+        {
+          collectionName: `dual`
+        },
+        {
+          fieldName: 'offerId',
+          operator: '==',
+          compareValue: Number(currentUserData.id)
+        }
+      )
+      if (!checkAdded.find(room => room.answerId === Number(answerData.id))) {
+        dispatch(
+          sendOffer({
+            collectionName: `dual`,
+            roomId: v4(),
+            videoId: Number(videoId),
+            videoUrl: videoDetail.video.url,
+            offerId: Number(currentUserData.id),
+            offerDisplayName: currentUserData.name,
+            answerId: Number(answerData.id),
+            answerDisplayName: answerData.userName,
+            battleStatus: 'idle'
+          })
+        )
+      }
+    }
+  }
+
+  const handleAcceptKaiwaInvite = async roomData => {
     dispatch(
       changeRoomStatus({
+        collectionName: `watchings/${videoId}/rooms`,
         roomId: roomData.id,
         videoId: roomData.videoId
       })
@@ -75,22 +110,37 @@ function RightMenu({ videoDetail }) {
     navigate(`/room/${videoId}/${roomData.roomId}`)
   }
 
+  const handleAcceptDualInvite = async roomData => {
+    dispatch(
+      changeRoomStatus({
+        collectionName: `dual`,
+        roomId: roomData.id,
+        videoId: roomData.videoId
+      })
+    )
+    navigate(`/dual/${roomData.roomId}`)
+  }
+
   useEffect(() => {
     const handleOfferNavigate = () => {
-      const room = offerList.find(room => room.offerId === currentUserData.id)
+      const room = offerKaiwaList.find(room => room.offerId === currentUserData.id)
       if (room?.status === 'accepted') {
         navigate(`/room/${videoId}/${room.roomId}`)
+      }
+
+      const dual = offerDualList.find(room => room.offerId === currentUserData.id)
+      if (dual?.status === 'accepted') {
+        navigate(`/dual/${dual.roomId}`)
       }
     }
 
     handleOfferNavigate()
 
     return () => {}
-  }, [offerList])
+  }, [offerKaiwaList, offerDualList])
 
   return (
     <>
-      {console.log('re-render right menu')}
       {/* WATTING TOAST */}
       <Snackbar
         open={openToast}
@@ -106,14 +156,14 @@ function RightMenu({ videoDetail }) {
       />
 
       {/* ACEPT INVITE MODAL */}
-      {offerList?.map(
+      {offerKaiwaList?.map(
         (room, index) =>
           room.answerId === Number(currentUserData.id) &&
           room.status === 'waitting' && (
             <Dialog
               key={index}
-              open={openModal}
-              onClose={() => setOpenModal(false)}
+              open={openKaiwaModal}
+              onClose={() => setOpenKaiwaModal(false)}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
             >
@@ -121,10 +171,37 @@ function RightMenu({ videoDetail }) {
                 {room.offerDisplayName} has invite you to kaiwa !!!
               </DialogTitle>
               <DialogActions>
-                <Button color="secondaryBtn" onClick={() => setOpenModal(false)}>
+                <Button color="secondaryBtn" onClick={() => setOpenKaiwaModal(false)}>
                   Disagree
                 </Button>
-                <Button color="primaryBtn" onClick={() => handleAccept(room)} autoFocus>
+                <Button color="primaryBtn" onClick={() => handleAcceptKaiwaInvite(room)} autoFocus>
+                  Agree
+                </Button>
+              </DialogActions>
+            </Dialog>
+          )
+      )}
+
+      {/* ACEPT INVITE MODAL */}
+      {offerDualList?.map(
+        (room, index) =>
+          room.answerId === Number(currentUserData.id) &&
+          room.status === 'waitting' && (
+            <Dialog
+              key={index}
+              open={openDualModal}
+              onClose={() => setOpenDualModal(false)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                {room.offerDisplayName} has invite you to a dual battle !!!
+              </DialogTitle>
+              <DialogActions>
+                <Button color="secondaryBtn" onClick={() => setOpenDualModal(false)}>
+                  Disagree
+                </Button>
+                <Button color="primaryBtn" onClick={() => handleAcceptDualInvite(room)} autoFocus>
                   Agree
                 </Button>
               </DialogActions>
@@ -184,7 +261,11 @@ function RightMenu({ videoDetail }) {
 
         <Box className="w-full lg:h-[94%] h-[90%]">
           {currentTab === 'people' ? (
-            <WatchingList watchingList={watchingList} handleSendOffer={handleSendOffer} />
+            <WatchingList
+              watchingList={watchingList}
+              handleSendOffer={handleSendOffer}
+              handleStartBattle={handleStartBattle}
+            />
           ) : currentTab === 'chat' ? (
             <ChatBox collectionName={`watchings/${videoId}/messages`} messageList={messageList} />
           ) : (

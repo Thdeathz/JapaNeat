@@ -33,7 +33,7 @@ export default function RoomChat() {
         if (mediaType === 'video') {
           setRemoteUser(user)
         }
-        if (mediaType === 'audiox') {
+        if (mediaType === 'audio') {
           user.audioTrack.play()
         }
       })
