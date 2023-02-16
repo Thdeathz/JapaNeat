@@ -25,7 +25,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   }
 }))
 
-function WatchingList({ watchingList, handleSendOffer }) {
+function WatchingList({ watchingList, handleSendOffer, handleStartBattle }) {
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
 
   return (
@@ -43,9 +43,8 @@ function WatchingList({ watchingList, handleSendOffer }) {
           watchingList.map(
             user =>
               Number(user.id) !== currentUserData.id && (
-                <ButtonBase
+                <Box
                   key={user.id}
-                  onClick={() => handleSendOffer(user)}
                   sx={{
                     p: '0.4rem 0.6rem',
                     borderRadius: '0.25rem',
@@ -55,17 +54,61 @@ function WatchingList({ watchingList, handleSendOffer }) {
                   }}
                 >
                   <FlexBetween className="w-full">
-                    <StyledBadge
-                      overlap="circular"
-                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                      variant="dot"
-                    >
-                      <AccountCircle />
-                    </StyledBadge>
-                    <Typography variant="h6">{user?.userName}</Typography>
-                    <CameraIndoorIcon />
+                    <FlexBetween gap="0.5rem">
+                      <StyledBadge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        variant="dot"
+                      >
+                        <AccountCircle />
+                      </StyledBadge>
+                      <Typography
+                        variant="h6"
+                        sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                      >
+                        {user?.userName}
+                      </Typography>
+                    </FlexBetween>
+
+                    <FlexBetween className="h-full">
+                      <ButtonBase
+                        className="h-full"
+                        sx={{
+                          p: '0.5rem 0.5rem 0.5rem 1rem',
+                          borderTopLeftRadius: '0.5rem',
+                          borderBottomLeftRadius: '0.5rem',
+                          '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.25)' }
+                        }}
+                        onClick={() => handleSendOffer(user)}
+                      >
+                        <Typography
+                          variant="h8"
+                          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: '500' }}
+                        >
+                          K🗣️iwa
+                        </Typography>
+                      </ButtonBase>
+
+                      <ButtonBase
+                        className="h-full"
+                        sx={{
+                          p: '0.5rem 1rem 0.5rem 0.5rem',
+                          borderTopRightRadius: '0.5rem',
+                          borderBottomRightRadius: '0.5rem',
+                          '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.25)' }
+                        }}
+                        onClick={() => handleStartBattle(user)}
+                      >
+                        <Typography
+                          variant="h8"
+                          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: '500' }}
+                        >
+                          B⚔️ttle
+                        </Typography>
+                      </ButtonBase>
+                    </FlexBetween>
                   </FlexBetween>
-                </ButtonBase>
+                </Box>
               )
           )
         ) : (
@@ -78,7 +121,8 @@ function WatchingList({ watchingList, handleSendOffer }) {
 
 WatchingList.propTypes = {
   watchingList: PropTypes.array,
-  handleSendOffer: PropTypes.func.isRequired
+  handleSendOffer: PropTypes.func.isRequired,
+  handleStartBattle: PropTypes.func.isRequired
 }
 
 export default React.memo(WatchingList)

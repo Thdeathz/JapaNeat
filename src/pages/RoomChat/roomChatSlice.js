@@ -9,7 +9,7 @@ const initialState = {
 export const sendOffer = createAsyncThunk('roomChat/createOffer', async initialState => {
   try {
     await addDocument({
-      collectionName: `watchings/${initialState.videoId}/rooms`,
+      collectionName: initialState.collectionName,
       id: initialState.roomId,
       data: {
         ...initialState,
@@ -28,7 +28,7 @@ export const changeRoomStatus = createAsyncThunk(
   async initialState => {
     try {
       await updateDocument({
-        collectionName: `watchings/${initialState.videoId}/rooms`,
+        collectionName: initialState.collectionName,
         id: initialState.roomId,
         data: {
           status: 'accepted'

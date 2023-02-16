@@ -8,7 +8,8 @@ import {
   Demo,
   Records,
   Videos,
-  Ranking
+  Ranking,
+  DualRoom
 } from '~/pages'
 
 // Layout
@@ -25,7 +26,8 @@ const privateRoutes = [
   { path: '/room/:videoId/:roomId', component: RoomChat, layout: NoLayout },
   { path: '/records', component: Records, layout: DefaultLayout },
   { path: '/record/:recordId', component: RecordDetail, layout: DefaultLayout },
-  { path: '/ranking', component: Ranking, layout: DefaultLayout }
+  { path: '/ranking', component: Ranking, layout: DefaultLayout },
+  { path: '/dual/:roomId', component: DualRoom, layout: BackArrowLayout }
 ]
 
 export { publicRoutes, privateRoutes }

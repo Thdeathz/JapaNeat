@@ -1,5 +1,9 @@
 import AgoraRTC from 'agora-rtc-sdk-ng'
-import { createClient, createMicrophoneAndCameraTracks } from 'agora-rtc-react'
+import {
+  createBufferSourceAudioTrack,
+  createClient,
+  createMicrophoneAndCameraTracks
+} from 'agora-rtc-react'
 import { APP_ID } from './config'
 // import { RtcRole, RtcTokenBuilder } from 'agora-access-token'
 
@@ -35,3 +39,15 @@ export const useMicrophoneAndCameraTracks = createMicrophoneAndCameraTracks(
     }
   }
 )
+
+const handleCreateBufferSourceAudioTrack = client => {
+  const bufferSource = createBufferSourceAudioTrack({
+    codec: 'pcm'
+  })
+
+  const recordEngine = createRecordingEngine()
+
+  return { bufferSource }
+}
+
+export const useAudioRecorder = handleCreateBufferSourceAudioTrack
