@@ -14,8 +14,7 @@ function VideoCard({ videoId }) {
   const video = useSelector(state => selectVideoById(state, Number(videoId)))
 
   const cardRef = useRef(null)
-  // const isHover = useHover(cardRef)
-  const isHover = false
+  const isHover = useHoverDelay(cardRef)
 
   return (
     <Card className={'w-full'} ref={cardRef}>
@@ -27,7 +26,12 @@ function VideoCard({ videoId }) {
             </video>
           </Box>
         ) : (
-          <CardMedia component="img" image={video.video.thumbnail} alt="video thumbnail" />
+          <CardMedia
+            className="md:h-[20vh] h-full object-cover"
+            component="img"
+            image={video.video.thumbnail}
+            alt="video thumbnail"
+          />
         )}
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
