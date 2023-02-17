@@ -9,7 +9,8 @@ import {
   Records,
   Videos,
   Ranking,
-  DualRoom
+  DualRoom,
+  BattleList
 } from '~/pages'
 
 // Layout
@@ -27,7 +28,8 @@ const privateRoutes = [
   { path: '/records', component: Records, layout: DefaultLayout },
   { path: '/record/:recordId', component: RecordDetail, layout: DefaultLayout },
   { path: '/ranking', component: Ranking, layout: DefaultLayout },
-  { path: '/dual/:roomId', component: DualRoom, layout: BackArrowLayout }
+  { path: '/battles', component: BattleList, layout: DefaultLayout },
+  { path: '/dual/:offerId/:answerId/:roomId', component: DualRoom, layout: NoLayout }
 ]
 
 export { publicRoutes, privateRoutes }

@@ -33,7 +33,7 @@ function SendMessage({ collectionName, userData, bottomRef }) {
 
   return (
     <FormControl className="w-full" sx={{ p: '0.5rem' }}>
-      <FlexBetween className="bg-white rounded-lg" gap="0.5rem" sx={{ alignItems: 'flex-end' }}>
+      <FlexBetween className="bg-white rounded-lg" gap="0.25rem" sx={{ alignItems: 'flex-end' }}>
         <Box width="100%" display="flex">
           <InputBase
             id="message"

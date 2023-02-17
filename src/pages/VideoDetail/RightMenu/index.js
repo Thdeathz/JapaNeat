@@ -92,7 +92,10 @@ function RightMenu({ videoDetail }) {
             offerDisplayName: currentUserData.name,
             answerId: Number(answerData.id),
             answerDisplayName: answerData.userName,
-            battleStatus: 'idle'
+            battleStatus: 'idle',
+            calculatePoint: 'idle',
+            offerPoint: 0,
+            answerPoint: 0
           })
         )
       }
@@ -118,7 +121,7 @@ function RightMenu({ videoDetail }) {
         videoId: roomData.videoId
       })
     )
-    navigate(`/dual/${roomData.roomId}`)
+    navigate(`/dual/${roomData.offerId}/${roomData.answerId}/${roomData.roomId}`)
   }
 
   useEffect(() => {
@@ -130,7 +133,7 @@ function RightMenu({ videoDetail }) {
 
       const dual = offerDualList.find(room => room.offerId === currentUserData.id)
       if (dual?.status === 'accepted') {
-        navigate(`/dual/${dual.roomId}`)
+        navigate(`/dual/${dual.offerId}/${dual.answerId}/${dual.roomId}`)
       }
     }
 

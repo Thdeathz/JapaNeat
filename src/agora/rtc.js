@@ -30,15 +30,19 @@ import { APP_ID } from './config'
 
 export const useClient = createClient({ mode: 'rtc', codec: 'vp8' })
 
-export const useMicrophoneAndCameraTracks = createMicrophoneAndCameraTracks(
-  {},
-  {
-    encoderConfig: {
-      width: { min: 640, ideal: 1920, max: 1920 },
-      height: { min: 480, ideal: 1080, max: 1080 }
-    }
+export const useMicrophoneAndCameraTracks = isCreate => {
+  if (isCreate) {
+    return createMicrophoneAndCameraTracks(
+      {},
+      {
+        encoderConfig: {
+          width: { min: 640, ideal: 1920, max: 1920 },
+          height: { min: 480, ideal: 1080, max: 1080 }
+        }
+      }
+    )
   }
-)
+}
 
 const handleCreateBufferSourceAudioTrack = client => {
   const bufferSource = createBufferSourceAudioTrack({
