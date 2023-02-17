@@ -1,23 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Box, ButtonBase, Typography } from '@mui/material'
-import { AgoraVideoPlayer } from 'agora-rtc-react'
+import {
+  Box,
+  Button,
+  ButtonBase,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Typography,
+  useMediaQuery
+} from '@mui/material'
+import AgoraRTC from 'agora-rtc-sdk-ng'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useClient, useMicrophoneAndCameraTracks } from '~/agora/rtc'
+import { useClient } from '~/agora/rtc'
 import { ChatBox, FlexBetween, Loading } from '~/components'
 import useFirestore from '~/hooks/useFirestore'
 import { useGetVideosQuery } from '../VideoDetail/videosSlice'
 import { toast } from 'react-toastify'
 import images from '~/assets/images'
 import { APP_ID } from '~/agora/config'
-import { updateDocument } from '~/firebase/services'
+import { deleteDocument, updateDocument } from '~/firebase/services'
 import { useReactMediaRecorder } from 'react-media-recorder'
 import useMergeFiles from '~/hooks/useMergeFiles'
 import uploadFile from '~/hooks/uploadFile'
+import NextVideoSelect from './NextVideoSelect'
+import { ArrowBackOutlined } from '@mui/icons-material'
+import UserCamera from './UserCamera'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
 
 function DualRoom() {
   const navigate = useNavigate()
 
-  const { roomId } = useParams()
+  const { roomId, offerId, answerId } = useParams()
   const { data: videos, isLoading } = useGetVideosQuery()
   const { handleMergeFiles } = useMergeFiles()
 
@@ -26,28 +40,21 @@ function DualRoom() {
   const messageList = useFirestore(`dual/${roomId}/messages`)
 
   const client = useClient()
-  const { ready, tracks } = useMicrophoneAndCameraTracks()
-  const [remoteUser, setRemoteUser] = useState(null)
   const [currentVideo, setCurrentVideo] = useState(null)
-  const [isProcessRecord, setIsProcessRecord] = useState(false)
+  const [tracks, setTracks] = useState(null)
+  const [offerUser, setOfferUser] = useState(null)
+  const [answerUser, setAnswerUser] = useState(null)
+  const [isCalculatePoint, setIsCalculatePoint] = useState(false)
+  const [isVoted, setIsVoted] = useState(false)
 
   const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({
     audio: true
   })
 
   const videoRef = useRef(null)
-
-  const handleChangeCurrentVideo = async (videoUrl, videoId) => {
-    await updateDocument({
-      collectionName: `dual`,
-      id: roomId,
-      data: {
-        videoId,
-        videoUrl,
-        battleStatus: 'idle'
-      }
-    })
-  }
+  const isDesktopScreen = useMediaQuery('(min-width:1024px)')
+  const isOfferUser = currentUser.id === Number(offerId)
+  const isAnswerUser = currentUser.id === Number(answerId)
 
   const handleBattleControl = async () => {
     if (roomData) {
@@ -69,12 +76,12 @@ function DualRoom() {
     if (roomData) {
       console.log('==> video ended')
       stopRecording()
-      setIsProcessRecord(true)
       await updateDocument({
         collectionName: `dual`,
         id: roomId,
         data: {
-          battleStatus: 'idle'
+          battleStatus: 'recordProcessing',
+          calculatePoint: 'processing'
         }
       })
       if (roomData.battleStatus === 'playing') {
@@ -88,23 +95,83 @@ function DualRoom() {
               collectionName: `dual`,
               id: roomId,
               data: {
-                lastRecord: currentVideo
+                lastRecord: currentVideo,
+                battleStatus: 'idle',
+                calculatePoint: 'idle'
               }
             })
-            setIsProcessRecord(false)
-          }, 5000)
+          }, 10000)
+
           // handleMergeFiles(roomData.videoUrl, fileUrl)
         }
       }
     }
   }
 
+  const handleLeaveRoom = async () => {
+    await client.leave()
+    client.removeAllListeners()
+    tracks[0].close()
+    tracks[1].close()
+
+    await deleteDocument({
+      collectionName: `dual`,
+      id: roomId
+    })
+
+    if (roomData?.offerPoint === roomData?.answerPoint) {
+      toast.info('Your dual battle is over !!!', {
+        toastId: 1
+      })
+    }
+
+    if (roomData?.offerPoint > roomData?.answerPoint) {
+      toast.info(`${roomData?.offerDisplayName} is the winner !!!`, {
+        toastId: 1
+      })
+    }
+
+    if (roomData?.offerPoint < roomData?.answerPoint) {
+      toast.info(`${roomData?.answerDisplayName} is the winner !!!`, {
+        toastId: 1
+      })
+    }
+
+    navigate('/videos')
+  }
+
+  const handleVote = async userId => {
+    let offerPoint = Number(roomData?.offerPoint)
+    let answerPoint = Number(roomData?.answerPoint)
+
+    if (userId == offerId) offerPoint = offerPoint + 1
+    if (userId == answerId) answerPoint = answerPoint + 1
+
+    await updateDocument({
+      collectionName: `dual`,
+      id: roomId,
+      data: {
+        offerPoint: offerPoint,
+        answerPoint: answerPoint
+      }
+    })
+
+    setIsCalculatePoint(false)
+    setIsVoted(true)
+  }
+
   useEffect(() => {
     let initRoom = async () => {
       client.on('user-published', async (user, mediaType) => {
         await client.subscribe(user, mediaType)
+
         if (mediaType === 'video') {
-          setRemoteUser(user)
+          if (tracks) {
+            if (user.uid == offerId || user.uid == answerId) setAnswerUser(user)
+          } else {
+            if (user.uid == offerId) setOfferUser(user)
+            if (user.uid == answerId) setAnswerUser(user)
+          }
         }
         if (mediaType === 'audiox') {
           user.audioTrack.play()
@@ -116,16 +183,31 @@ function DualRoom() {
           if (user.audioTrack) user.audioTrack.stop()
         }
         if (mediaType === 'video') {
-          setRemoteUser(null)
+          if (user.uid == offerId) {
+            setOfferUser(null)
+          }
+          if (user.uid == answerId) {
+            setAnswerUser(null)
+          }
         }
       })
 
       client.on('user-left', user => {
-        setRemoteUser(null)
+        if (user.uid == offerId) {
+          setOfferUser(null)
+        }
+        if (user.uid == answerId) {
+          setAnswerUser(null)
+        }
       })
 
       await client.join(APP_ID, roomId, null, currentUser.id)
-      if (tracks) await client.publish([tracks[0], tracks[1]])
+    }
+
+    const joinRoom = async () => {
+      if (tracks) {
+        await client.publish([tracks[0], tracks[1]])
+      }
     }
 
     const leaveRoom = async () => {
@@ -135,30 +217,36 @@ function DualRoom() {
       tracks[1].close()
     }
 
-    if (ready && tracks) {
-      initRoom()
-    }
+    initRoom()
+
+    joinRoom()
 
     if (!roomData) {
       leaveRoom()
       navigate('/videos')
-      toast.info('Your dual battle is over !!!', {
+      toast.info('Dual battle is over !!!', {
         toastId: 1
       })
     }
 
     return () => {}
-  }, [roomId, ready, tracks])
+  }, [roomId, currentUser, tracks])
 
   useEffect(() => {
-    const handleRoomDataChange = () => {
+    const handleRoomDataChange = async () => {
       if (roomData?.videoUrl !== currentVideo) {
-        setCurrentVideo(roomData.videoUrl)
+        setCurrentVideo(roomData?.videoUrl)
+        setIsVoted(false)
       }
+
       if (roomData?.battleStatus === 'playing') {
         videoRef?.current?.play()
       } else {
         videoRef?.current?.pause()
+      }
+
+      if (roomData?.calculatePoint === 'processing' && !isVoted) {
+        setIsCalculatePoint(true)
       }
     }
 
@@ -167,75 +255,159 @@ function DualRoom() {
     return () => {}
   }, [roomData])
 
+  useEffect(() => {
+    const handleGetMedia = async () => {
+      if (isOfferUser || isAnswerUser) {
+        const media = await AgoraRTC.createMicrophoneAndCameraTracks(
+          {},
+          {
+            encoderConfig: {
+              width: { min: 640, ideal: 1920, max: 1920 },
+              height: { min: 480, ideal: 1080, max: 1080 }
+            }
+          }
+        )
+        setTracks(media)
+      }
+    }
+
+    handleGetMedia()
+
+    return () => {}
+  }, [])
+
   return (
     <>
-      {isLoading ? (
+      {isLoading || !roomData ? (
         <Loading />
       ) : (
-        <FlexBetween gap="0.5rem" className=" w-screen h-screen overflow-hidden">
-          <FlexBetween
-            flexDirection="column"
-            className="basis-3/4 h-full pl-2 py-2"
-            sx={{ borderRadius: '0.5rem' }}
-          >
-            <FlexBetween gap="0.5rem" className="w-full h-[65vh] mb-2">
-              <Box className="basis-3/4 bg-slate-800">
-                {currentVideo && (
-                  <video
-                    ref={videoRef}
-                    className="rounded-lg"
-                    src={currentVideo}
-                    type="video/mp4"
-                    onEnded={handleEndVideo}
-                    muted
-                  />
-                )}
-              </Box>
+        <>
+          {/*BACK ARROW*/}
+          {!isOfferUser && !isAnswerUser && (
+            <Box className="px-5 py-2 absolute top-0 z-50">
+              <ButtonBase
+                sx={{
+                  px: '0.25rem',
+                  borderRadius: '0.25rem ',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                  }
+                }}
+                onClick={() => navigate(-1)}
+              >
+                <ArrowBackOutlined sx={{ color: '#6aa6fa' }} />
+                <Typography variant="h6" color="#6aa6fa">
+                  Back
+                </Typography>
+              </ButtonBase>
+            </Box>
+          )}
 
-              <FlexBetween flexDirection="column" className="basis-1/4 w-full h-full" gap="0.5rem">
-                <FlexBetween className="bg-slate-800 basis-1/2 w-full h-full rounded-lg relative">
-                  {ready && (
-                    <AgoraVideoPlayer
-                      id="video-call"
-                      videoTrack={tracks[1]}
-                      style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
-                    />
-                  )}
+          {roomData?.calculatePoint === 'processing' && (
+            <Dialog
+              open={isCalculatePoint}
+              onClose={() => setIsCalculatePoint(false)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                <FlexBetween flexDirection="column" gap="1rem">
+                  <Typography>{`Who's is the winner ???`}</Typography>
 
-                  <Typography
-                    variant="h6"
-                    className="absolute bottom-0 left-2"
-                    sx={{ color: '#6aa6fa' }}
-                  >
-                    You
-                  </Typography>
+                  <FlexBetween gap="1rem">
+                    <ButtonBase onClick={() => handleVote(offerId)}>
+                      {roomData?.offerDisplayName}
+                    </ButtonBase>
+                    <Typography>⚔️</Typography>
+                    <ButtonBase onClick={() => handleVote(answerId)}>
+                      {roomData?.answerDisplayName}
+                    </ButtonBase>
+                  </FlexBetween>
                 </FlexBetween>
+              </DialogTitle>
+            </Dialog>
+          )}
 
-                <FlexBetween className="bg-slate-800 basis-1/2 w-full h-full rounded-lg relative">
-                  {remoteUser?.videoTrack && (
-                    <AgoraVideoPlayer
-                      id="video-call"
-                      style={{ height: '100%', width: '100%' }}
-                      videoTrack={remoteUser.videoTrack}
-                    />
+          {/*PAGE CONTENT*/}
+          <FlexBetween
+            gap="0.5rem"
+            className="bg-slate-800 w-screen h-screen overflow-y-auto lg:flex-row flex-col p-2"
+          >
+            <FlexBetween
+              flexDirection="column"
+              className="lg:basis-3/4 lg:h-full w-full"
+              sx={{ borderRadius: '0.5rem' }}
+            >
+              <FlexBetween gap="0.5rem" className="w-full h-[65vh] mb-2 lg:flex-row flex-col">
+                <Box className="lg:basis-3/4 w-full lg:h-full h-[40vh] relative">
+                  {currentVideo && (
+                    <>
+                      <video
+                        ref={videoRef}
+                        className="w-full h-full rounded-lg"
+                        src={currentVideo}
+                        type="video/mp4"
+                        onEnded={handleEndVideo}
+                        muted
+                      />
+
+                      {roomData?.battleStatus === 'recordProcessing' && (
+                        <Box
+                          className="absolute top-0 w-full lg:h-full h-[40vh] z-10 flex items-center justify-center"
+                          sx={{ backgroundColor: 'rgba(0, 0, 0, 0.45)' }}
+                        >
+                          <Typography
+                            variant="h4"
+                            sx={{
+                              fontWeight: '700',
+                              color: 'rgba(255, 255, 255, 0.75)',
+                              textAlign: 'center'
+                            }}
+                          >
+                            Video processing
+                            <br />
+                            <CircularProgress
+                              sx={{
+                                fontSize: '6rem',
+                                fontWeight: '700',
+                                color: 'rgba(255, 255, 255, 0.75)'
+                              }}
+                            />
+                          </Typography>
+                        </Box>
+                      )}
+                    </>
                   )}
+                </Box>
 
-                  <Typography
-                    variant="h6"
-                    className="absolute bottom-0 left-2"
-                    sx={{ color: '#6aa6fa' }}
-                  >
-                    {roomData?.offerId === currentUser.id
-                      ? roomData?.answerDisplayName
-                      : roomData?.offerDisplayName}
-                  </Typography>
+                <FlexBetween
+                  className="lg:basis-1/4 w-full lg:h-full h-[25vh] lg:flex-col flex-row"
+                  gap="0.5rem"
+                >
+                  <FlexBetween className="bg-slate-800 basis-1/2 w-full h-full rounded-lg relative">
+                    <UserCamera
+                      videoTrack={tracks ? tracks[1] : offerUser?.videoTrack}
+                      userName={tracks ? 'You' : roomData?.offerDisplayName}
+                    />
+                  </FlexBetween>
+
+                  <FlexBetween className="bg-slate-800 basis-1/2 w-full h-full rounded-lg relative">
+                    <UserCamera
+                      videoTrack={answerUser?.videoTrack}
+                      userName={
+                        tracks
+                          ? !isOfferUser
+                            ? roomData?.offerDisplayName
+                            : roomData?.answerDisplayName
+                          : roomData?.answerDisplayName
+                      }
+                    />
+                  </FlexBetween>
                 </FlexBetween>
               </FlexBetween>
-            </FlexBetween>
 
-            <FlexBetween gap="0.5rem" className="bg-secondary w-full h-[35vh] p-2 rounded-lg">
-              <FlexBetween flexDirection="column" className="basis-[50%] h-full">
-                <Box className="bg-slate-800 w-full h-full rounded-lg">
+              <FlexBetween gap="0.5rem" className="bg-secondary w-full h-[33vh] p-2 rounded-lg">
+                <Box className=" bg-slate-800 basis-[50%] w-full h-full rounded-lg">
                   {roomData?.lastRecord && (
                     <video
                       className="w-full h-full rounded-lg"
@@ -245,87 +417,112 @@ function DualRoom() {
                     />
                   )}
                 </Box>
-              </FlexBetween>
 
-              <FlexBetween flexDirection="column" className="basis-[30%] h-full">
-                <Box id="video-list" className="w-full flex flex-col gap-1 overflow-y-scroll">
-                  {videos.ids.map((id, index) => (
-                    <ButtonBase
-                      key={`next-video-list-${index}`}
-                      sx={{
-                        width: '100%',
-                        borderRadius: '0.5rem',
-                        backgroundColor: roomData?.videoId === id ? 'rgba(0, 0, 0, 0.25)' : 'none',
-                        '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.15)' }
-                      }}
-                      onClick={() => handleChangeCurrentVideo(videos.entities[id].video.url, id)}
-                    >
-                      <Box
-                        display="flex"
-                        justifyContent="flex-start"
-                        alignItems="center"
-                        gap={2}
-                        className="w-full p-2"
-                      >
-                        <img
-                          className="w-[30%] rounded"
-                          src={videos.entities[id].video.thumbnail ?? images.noImage}
-                        />
-                        <Box>
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              textOverflow: 'break-word',
-                              fontWeight: '500',
-                              textAlign: 'left'
-                            }}
-                          >
-                            {videos.entities[id].title}
-                          </Typography>
+                {isDesktopScreen && (
+                  <NextVideoSelect
+                    videos={videos}
+                    roomId={roomId}
+                    roomData={roomData}
+                    className="basis-[30%] h-full"
+                  />
+                )}
 
-                          <Typography
-                            variant="h8"
-                            sx={{
-                              textAlign: 'left'
-                            }}
-                          >
-                            {videos.entities[id].category}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </ButtonBase>
-                  ))}
+                <Box flexDirection="column" className="lg:basis-[20%] basis-[50%] h-full">
+                  <Box className="w-full">
+                    <FlexBetween className="w-full">
+                      <Typography variant="h6">{roomData?.offerDisplayName}</Typography>
+                      <Typography variant="h6">{roomData?.offerPoint} ⭐</Typography>
+                    </FlexBetween>
+
+                    <FlexBetween className="w-full">
+                      <Typography variant="h6">{roomData?.answerDisplayName}</Typography>
+                      <Typography variant="h6">{roomData?.answerPoint} ⭐</Typography>
+                    </FlexBetween>
+                  </Box>
+
+                  {(isOfferUser || isAnswerUser) && (
+                    <>
+                      <FlexBetween gap="0.5rem">
+                        <ButtonBase
+                          sx={{
+                            width: '100%',
+                            py: '0.5rem',
+                            borderRadius: '0.5rem',
+                            fontSize: '1rem',
+                            fontWeight: '700',
+                            color: '#fff',
+                            backgroundColor: '#6aa6fa'
+                          }}
+                          onClick={handleBattleControl}
+                        >
+                          {roomData?.battleStatus === 'playing' ? 'Pause dual' : 'Start dual'}
+                        </ButtonBase>
+
+                        <ButtonBase
+                          sx={{
+                            width: '100%',
+                            py: '0.5rem',
+                            borderRadius: '0.5rem',
+                            fontSize: '1rem',
+                            fontWeight: '700',
+                            color: '#fff',
+                            backgroundColor: 'red'
+                          }}
+                          onClick={handleLeaveRoom}
+                        >
+                          End battle
+                        </ButtonBase>
+                      </FlexBetween>
+
+                      {roomData?.lastRecord && (
+                        <ButtonBase
+                          sx={{
+                            mt: '0.5rem',
+                            width: '100%',
+                            py: '0.5rem',
+                            borderRadius: '0.5rem',
+                            fontSize: '1rem',
+                            fontWeight: '700',
+                            color: '#fff',
+                            backgroundColor: '#6aa6fa'
+                          }}
+                        >
+                          <UploadFileIcon />
+                          <Typography sx={{ fontWeight: '500' }}>Save last record</Typography>
+                        </ButtonBase>
+                      )}
+                    </>
+                  )}
                 </Box>
               </FlexBetween>
-
-              <Box flexDirection="column" className="basis-[20%] h-full">
-                <Box>
-                  <Typography variant="h6">{roomData?.offerDisplayName}</Typography>
-                  <Typography variant="h6">{roomData?.answerDisplayName}</Typography>
-                </Box>
-
-                <ButtonBase
-                  sx={{
-                    width: '100%',
-                    py: '0.5rem',
-                    borderRadius: '0.5rem',
-                    fontSize: '1.5rem',
-                    fontWeight: '700',
-                    color: '#fff',
-                    backgroundColor: '#6aa6fa'
-                  }}
-                  onClick={handleBattleControl}
-                >
-                  {roomData?.battleStatus === 'playing' ? 'Pause dual' : 'Start dual'}
-                </ButtonBase>
-              </Box>
             </FlexBetween>
-          </FlexBetween>
 
-          <Box className="basis-1/4 h-full bg-secondary">
-            <ChatBox collectionName={`dual/${roomId}/messages`} messageList={messageList} />
-          </Box>
-        </FlexBetween>
+            {isDesktopScreen ? (
+              <Box className="bg-secondary lg:basis-1/4 h-full rounded-lg py-2">
+                <ChatBox collectionName={`dual/${roomId}/messages`} messageList={messageList} />
+              </Box>
+            ) : (
+              <FlexBetween className="bg-secondary w-full h-[35vh] rounded-lg p-2">
+                {(isOfferUser || isAnswerUser) && (
+                  <NextVideoSelect
+                    videos={videos}
+                    roomId={roomId}
+                    roomData={roomData}
+                    className="basis-1/2 h-full"
+                  />
+                )}
+
+                <Box
+                  className={
+                    isOfferUser || isAnswerUser ? 'basis-1/2 w-full h-full' : 'w-full h-[35vh]'
+                  }
+                >
+                  <ChatBox collectionName={`dual/${roomId}/messages`} messageList={messageList} />
+                </Box>
+              </FlexBetween>
+            )}
+          </FlexBetween>
+        </>
       )}
     </>
   )

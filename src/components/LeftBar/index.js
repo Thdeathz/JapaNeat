@@ -6,6 +6,7 @@ import {
   Home,
   HomeOutlined,
   InterpreterMode,
+  LiveTvOutlined,
   NoteAdd,
   Settings,
   SettingsOutlined,
@@ -30,6 +31,7 @@ function LeftBar() {
   const isHomePage = location.pathname === '/'
   const isVideosPage = location.pathname === '/videos'
   const isRecordsPage = location.pathname?.includes('record')
+  const isBattlesPage = location.pathname === '/battles'
   const isRankingPage = location.pathname === '/ranking'
 
   const musicAchivement = JSON.parse(localStorage.getItem('currentAchievements'))?.filter(
@@ -69,8 +71,12 @@ function LeftBar() {
         <VideoLibrary color={isVideosPage ? 'textPrimary' : 'black'} sx={{ fontSize: '1.5rem' }} />
       </LeftBarButtton>
 
-      <LeftBarButtton title="Seiyuu">
-        <InterpreterMode color={false ? 'textPrimary' : 'black'} sx={{ fontSize: '1.5rem' }} />
+      <LeftBarButtton
+        title="Dual battle"
+        isActive={isBattlesPage}
+        handleOnClick={() => navigate('/battles')}
+      >
+        <LiveTvOutlined color={false ? 'textPrimary' : 'black'} sx={{ fontSize: '1.5rem' }} />
       </LeftBarButtton>
 
       <Divider sx={{ width: '100%' }} />

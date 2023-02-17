@@ -3,7 +3,8 @@ const images = {
   logo: require('./logo-only.png'),
   demoImage: require('./Demo.png'),
   loginThumbnail: require('./login_thumbnail.jpg'),
-  noImage: require('./login_thumbnail.jpg')
+  noImage: require('./login_thumbnail.jpg'),
+  battleThumbnail: require('./battle_thumbnail.jpg')
 }
 
 export default images
