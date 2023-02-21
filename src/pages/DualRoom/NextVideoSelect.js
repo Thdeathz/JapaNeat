@@ -19,7 +19,7 @@ function NextVideoSelect({ videos, roomId, roomData, className }) {
 
   return (
     <FlexBetween flexDirection="column" className={className}>
-      <Box id="video-list" className="w-full flex flex-col gap-1 overflow-y-scroll">
+      <Box className="w-full flex flex-col gap-1 overflow-y-scroll no-scroll-bar">
         {videos.ids.map((id, index) => (
           <ButtonBase
             key={`next-video-list-${index}`}

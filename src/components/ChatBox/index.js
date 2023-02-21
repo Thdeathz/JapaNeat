@@ -4,11 +4,15 @@ import FlexBetween from '../FlexBetween'
 import { Box, Typography } from '@mui/material'
 import SendMessage from './SendMessage'
 import MessageList from './MessageList'
+import { collection } from 'firebase/firestore'
+import { useFirestore, useFirestoreCollectionData } from 'reactfire'
 
-function ChatBox({ collectionName, messageList }) {
+function ChatBox({ collectionName }) {
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
-
   const bottomRef = useRef(null)
+
+  const ref = collection(useFirestore(), collectionName)
+  const { status, data: messageList } = useFirestoreCollectionData(ref)
 
   useEffect(() => {
     bottomRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -23,8 +27,7 @@ function ChatBox({ collectionName, messageList }) {
         className="w-full px-2 pt-4 overflow-y-scroll"
         sx={{ overflow: 'auto' }}
       >
-        {console.log(messageList)}
-        {messageList.map((message, index) => (
+        {messageList?.map((message, index) => (
           <Box key={`message-list-${index}`}>
             {message.userId === -999 ? (
               <Box className="bg-cardHeadline max-w-[90%] py-2 px-4 rounded-lg">
@@ -50,8 +53,7 @@ function ChatBox({ collectionName, messageList }) {
 }
 
 ChatBox.propTypes = {
-  collectionName: PropTypes.string.isRequired,
-  messageList: PropTypes.array.isRequired
+  collectionName: PropTypes.string.isRequired
 }
 
 export default React.memo(ChatBox)

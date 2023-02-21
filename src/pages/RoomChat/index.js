@@ -1,19 +1,18 @@
-import { Box, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { Box, Typography } from '@mui/material'
 import { selectVideoById, useGetVideosQuery } from '../VideoDetail/videosSlice'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { FlexBetween, Loading } from '~/components'
 import useFirestore from '~/hooks/useFirestore'
 import { APP_ID } from '~/agora/config'
-import { useClient, useMicrophoneAndCameraTracks } from '~/agora/rtc'
+import { useClient, useMicrophoneAndCameraTracks, useVideoCall } from '~/agora/rtc'
 import { AgoraVideoPlayer } from 'agora-rtc-react'
 import { toast } from 'react-toastify'
 import VideoCallControl from './VideoCallControl'
 
 export default function RoomChat() {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   const { roomId, videoId } = useParams()
   const { isLoading } = useGetVideosQuery()
@@ -27,13 +26,13 @@ export default function RoomChat() {
   const [remoteUser, setRemoteUser] = useState(null)
 
   useEffect(() => {
-    let initRoom = async () => {
+    const initRoom = async () => {
       client.on('user-published', async (user, mediaType) => {
         await client.subscribe(user, mediaType)
         if (mediaType === 'video') {
           setRemoteUser(user)
         }
-        if (mediaType === 'audio') {
+        if (mediaType === 'audiox') {
           user.audioTrack.play()
         }
       })
@@ -60,7 +59,6 @@ export default function RoomChat() {
       client.removeAllListeners()
       tracks[0].close()
       tracks[1].close()
-      navigate('/videos')
     }
 
     if (ready && tracks) {
@@ -72,9 +70,17 @@ export default function RoomChat() {
       toast.info('Your Kaiwa session is over !!!', {
         toastId: 1
       })
+      navigate('/videos')
     }
 
-    return () => {}
+    return () => {
+      if (tracks) {
+        client.leave()
+        client.removeAllListeners()
+        tracks[0].close()
+        tracks[1].close()
+      }
+    }
   }, [videoId, roomId, ready, tracks, roomData])
 
   return (
@@ -87,7 +93,6 @@ export default function RoomChat() {
           gap="1rem"
           className="bg-slate-800 w-screen h-screen overflow-hidden p-4"
         >
-          {console.log('===> remoteUser', remoteUser)}
           <Box className="basis-11/12 w-full" sx={{ borderRadius: '0.5rem' }}>
             <FlexBetween className="w-full h-full lg:flex-row flex-col" gap="1.5rem">
               <FlexBetween alignItems="center" className="basis-3/4 h-full ">

@@ -82,7 +82,12 @@ function MusicWidget({ musicData }) {
           <Typography
             variant="h8"
             className="basis-3/4 transition ease-in-out duration-300"
-            sx={{ fontWeight: '500' }}
+            sx={{
+              fontWeight: '500',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
           >
             {musicData.name}
           </Typography>

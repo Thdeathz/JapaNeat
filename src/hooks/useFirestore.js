@@ -1,5 +1,5 @@
-import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
+import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from '~/firebase/config'
 
 const useFirestore = (collectionName, documentId, condition) => {
@@ -25,6 +25,7 @@ const useFirestore = (collectionName, documentId, condition) => {
         collectionRef = query(collectionRef, orderBy('createdAt', 'asc'))
       }
     }
+
     const unsubscribe = onSnapshot(collectionRef, snapshot => {
       let res
       if (documentId) {
@@ -35,7 +36,7 @@ const useFirestore = (collectionName, documentId, condition) => {
           id: doc.id
         }))
       }
-      console.log('=====> ref', res)
+      // console.log('=====> ref', res)
       setDocuments(res)
     })
 

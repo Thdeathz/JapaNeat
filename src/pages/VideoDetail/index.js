@@ -21,7 +21,6 @@ export default function VideoDetail() {
 
   useEffect(() => {
     const handleAddUserToWatchingList = async () => {
-      console.log('==> add user')
       if (currentUserData) {
         dispatch(
           addToWatchinglist({
@@ -57,6 +56,7 @@ export default function VideoDetail() {
             >
               <source src={video.video.url} type="video/mp4" />
             </video>
+
             <Box className="lg:w-[25vw] w-full lg:h-screen h-[60vh]">
               <RightMenu videoDetail={video} />
             </Box>

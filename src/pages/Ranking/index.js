@@ -10,7 +10,10 @@ function Ranking() {
 
   return (
     <Box
-      className="min-h-screen py-4 flex justify-center items-start
+      display="flex"
+      justifyContent="center"
+      alignItems={isLoading ? 'center' : 'flex-start'}
+      className="min-h-screen py-4
         bg-gradient-to-r from-[#3EADCF] to-[#ABE9CD]"
     >
       {isLoading ? (

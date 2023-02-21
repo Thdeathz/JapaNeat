@@ -14,7 +14,8 @@ function VideoCard({ videoId }) {
   const video = useSelector(state => selectVideoById(state, Number(videoId)))
 
   const cardRef = useRef(null)
-  const isHover = useHoverDelay(cardRef)
+  // const isHover = useHoverDelay(cardRef)
+  const isHover = false
 
   return (
     <Card className={'w-full'} ref={cardRef}>

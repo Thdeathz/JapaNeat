@@ -40,4 +40,4 @@ VideoInfo.propTypes = {
   videoDetail: PropTypes.object.isRequired
 }
 
-export default VideoInfo
+export default React.memo(VideoInfo)

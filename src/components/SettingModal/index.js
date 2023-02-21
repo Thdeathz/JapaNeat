@@ -27,7 +27,7 @@ function SettingModal({ openModal, setOpenModal }) {
 
   const handleSetSetting = () => {
     if (setting.music) {
-      localStorage.setItem('music', JSON.stringify(setting.music.url))
+      localStorage.setItem('music', JSON.stringify(setting.music))
     } else if (localStorage.getItem('music')) {
       localStorage.removeItem('music')
     }
