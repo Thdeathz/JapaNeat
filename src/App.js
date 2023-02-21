@@ -7,13 +7,16 @@ import 'react-toastify/dist/ReactToastify.css'
 import { Box, ThemeProvider } from '@mui/material'
 import { theme } from './app/theme'
 import { DefaultLayout } from './components/Layout'
+import { FirestoreProvider, useFirebaseApp } from 'reactfire'
+import { getFirestore } from 'firebase/firestore'
 
 function App() {
   const style = localStorage.getItem('cursor')
+  const firestoreInstance = getFirestore(useFirebaseApp())
 
   return (
     <BrowserRouter>
-      <Box className="App" sx={style && JSON.parse(style)}>
+      <Box className="h-screen w-screen" sx={style && JSON.parse(style)}>
         <ToastContainer autoClose={2000} style={{ fontSize: '16px' }} />
         <Routes>
           <Route element={<LoggedIn />}>
@@ -44,7 +47,9 @@ function App() {
                   element={
                     <ThemeProvider theme={theme}>
                       <Layout>
-                        <Page />
+                        <FirestoreProvider sdk={firestoreInstance}>
+                          <Page />
+                        </FirestoreProvider>
                       </Layout>
                     </ThemeProvider>
                   }

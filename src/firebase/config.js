@@ -10,7 +10,7 @@ import { getFirestore, connectFirestoreEmulator } from '@firebase/firestore'
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 // Production environment
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: 'AIzaSyAtv4e_ehKrlimXqtyDM3VKpMk_arvhp4Y',
   authDomain: 'japaneat-525ab.firebaseapp.com',
   projectId: 'japaneat-525ab',

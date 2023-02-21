@@ -13,11 +13,9 @@ import {
 } from '@mui/material'
 import { Box } from '@mui/system'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import useFirestore from '~/hooks/useFirestore'
-import { deleteDocument, getDocument } from '~/firebase/services'
-import { deleteRoomChat } from '~/pages/RoomChat/roomChatSlice'
+import { deleteDocument } from '~/firebase/services'
 import UserMenu from './UserMenu'
 import images from '~/assets/images'
 import FlexBetween from '~/components/FlexBetween'
@@ -84,7 +82,7 @@ function NavBar() {
     <Box className="bg-white border-b-[1px] border-[rgba(0,0,0,0.15)] ">
       <Toolbar className="flex justify-between items-center">
         <FlexBetween gap="2rem">
-          <FlexBetween className="cursor-pointer" gap="0.5rem" onClick={() => navigate('/')}>
+          <FlexBetween className="cursor-pointer" gap="0.5rem" onClick={() => navigate('/videos')}>
             <img src={images.logo} alt="logo" width={40} />
             <Typography variant="h6" color="#6aa6fa" noWrap component="div">
               JapaNeat

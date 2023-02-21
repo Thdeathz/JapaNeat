@@ -14,7 +14,7 @@ function Videos() {
       ) : (
         <>
           <FilterArea />
-          <Box className="flex flex-col justify-center items-start px-2 pb-4">
+          <Box className="flex flex-col justify-center items-start sm:px-2 px-4 pb-4">
             <Grid className="lg:gap-4 gap-2" container>
               {videos.ids.map((videoId, index) => (
                 <Grid

@@ -23,7 +23,13 @@ function LeftBarButton({ children, title, isActive = false, handleOnClick }) {
         {isDesktopScreen && (
           <Typography
             variant="h6"
-            sx={{ fontWeight: '500', color: isActive ? '#6aa6fa' : 'black' }}
+            sx={{
+              fontWeight: '500',
+              color: isActive ? '#6aa6fa' : 'black',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
           >
             {title}
           </Typography>

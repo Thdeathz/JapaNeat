@@ -3,7 +3,7 @@ import './Loading.scss'
 
 export default function Loading() {
   return (
-    <div className="flex justify-center items-center h-screen w-screen absolute top-0 left-0">
+    <div className="flex justify-center items-center h-full w-full">
       <svg
         className="tea w-[37px] h-[48px]"
         viewBox="0 0 37 48"

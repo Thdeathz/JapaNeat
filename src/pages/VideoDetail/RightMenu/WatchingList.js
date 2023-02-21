@@ -5,6 +5,12 @@ import { styled } from '@mui/material/styles'
 import CameraIndoorIcon from '@mui/icons-material/CameraIndoor'
 import AccountCircle from '@mui/icons-material/AccountCircle'
 import { FlexBetween, Loading } from '~/components'
+import { collection } from 'firebase/firestore'
+import { useFirestore, useFirestoreCollectionData } from 'reactfire'
+import { getDocument } from '~/firebase/services'
+import { sendOffer } from '~/pages/RoomChat/roomChatSlice'
+import { useDispatch } from 'react-redux'
+import { v4 } from 'uuid'
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -25,8 +31,76 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   }
 }))
 
-function WatchingList({ watchingList, handleSendOffer, handleStartBattle }) {
+function WatchingList({ videoId, videoDetail, setOpenToast }) {
+  const dispatch = useDispatch()
+
   const currentUserData = JSON.parse(localStorage.getItem('currentUser'))
+
+  const ref = collection(useFirestore(), 'watchings', videoId, 'members')
+  const { status, data: watchingList } = useFirestoreCollectionData(ref)
+
+  const handleSendOffer = async answerData => {
+    if (currentUserData) {
+      setOpenToast(true)
+      const checkAdded = await getDocument(
+        {
+          collectionName: `watchings/${videoId}/rooms`
+        },
+        {
+          fieldName: 'offerId',
+          operator: '==',
+          compareValue: Number(currentUserData.id)
+        }
+      )
+      if (!checkAdded.find(room => room.answerId === Number(answerData.NO_ID_FIELD))) {
+        dispatch(
+          sendOffer({
+            collectionName: `watchings/${videoId}/rooms`,
+            roomId: v4(),
+            videoId: Number(videoId),
+            offerId: Number(currentUserData.id),
+            offerDisplayName: currentUserData.name,
+            answerId: Number(answerData.NO_ID_FIELD),
+            answerDisplayName: answerData.userName
+          })
+        )
+      }
+    }
+  }
+
+  const handleStartBattle = async answerData => {
+    if (currentUserData) {
+      setOpenToast(true)
+      const checkAdded = await getDocument(
+        {
+          collectionName: `dual`
+        },
+        {
+          fieldName: 'offerId',
+          operator: '==',
+          compareValue: Number(currentUserData.id)
+        }
+      )
+      if (!checkAdded.find(room => room.answerId === Number(answerData.NO_ID_FIELD))) {
+        dispatch(
+          sendOffer({
+            collectionName: `dual`,
+            roomId: v4(),
+            videoId: Number(videoId),
+            videoUrl: videoDetail.video.url,
+            offerId: Number(currentUserData.id),
+            offerDisplayName: currentUserData.name,
+            answerId: Number(answerData.NO_ID_FIELD),
+            answerDisplayName: answerData.userName,
+            battleStatus: 'idle',
+            calculatePoint: 'idle',
+            offerPoint: 0,
+            answerPoint: 0
+          })
+        )
+      }
+    }
+  }
 
   return (
     <>
@@ -39,12 +113,12 @@ function WatchingList({ watchingList, handleSendOffer, handleStartBattle }) {
           overflow: 'auto'
         }}
       >
-        {watchingList ? (
+        {status === 'success' ? (
           watchingList.map(
-            user =>
-              Number(user.id) !== currentUserData.id && (
+            (user, index) =>
+              Number(user.NO_ID_FIELD) !== currentUserData.id && (
                 <Box
-                  key={user.id}
+                  key={`watching-list-${user.NO_ID_FIELD}-${index}`}
                   sx={{
                     p: '0.4rem 0.6rem',
                     borderRadius: '0.25rem',
@@ -120,9 +194,9 @@ function WatchingList({ watchingList, handleSendOffer, handleStartBattle }) {
 }
 
 WatchingList.propTypes = {
-  watchingList: PropTypes.array,
-  handleSendOffer: PropTypes.func.isRequired,
-  handleStartBattle: PropTypes.func.isRequired
+  videoId: PropTypes.string.isRequired,
+  videoDetail: PropTypes.object.isRequired,
+  setOpenToast: PropTypes.func.isRequired
 }
 
 export default React.memo(WatchingList)

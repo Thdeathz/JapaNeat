@@ -1,20 +1,12 @@
 import React, { useState } from 'react'
 import {
-  ConnectWithoutContact,
   EmojiEvents,
-  EmojiEventsOutlined,
-  Home,
-  HomeOutlined,
-  InterpreterMode,
   LiveTvOutlined,
   NoteAdd,
   Settings,
-  SettingsOutlined,
   UploadFile,
   VideoCameraFront,
-  VideoCameraFrontOutlined,
-  VideoLibrary,
-  VideoLibraryOutlined
+  VideoLibrary
 } from '@mui/icons-material'
 import { Divider, useMediaQuery } from '@mui/material'
 import { SettingModal } from '~/components'
@@ -28,15 +20,12 @@ function LeftBar() {
 
   const isDesktopScreen = useMediaQuery('(min-width: 1024px)')
 
-  const isHomePage = location.pathname === '/'
   const isVideosPage = location.pathname === '/videos'
   const isRecordsPage = location.pathname?.includes('record')
   const isBattlesPage = location.pathname === '/battles'
   const isRankingPage = location.pathname === '/ranking'
 
-  const musicAchivement = JSON.parse(localStorage.getItem('currentAchievements'))?.filter(
-    each => Number(each.type) === 0
-  )
+  const musicAchivement = localStorage.getItem('music')
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser'))
 
@@ -44,25 +33,13 @@ function LeftBar() {
 
   return (
     <>
-      {isDesktopScreen && currentUser.role != '0' && musicAchivement?.length !== 0 && (
+      {isDesktopScreen && currentUser.role != '0' && musicAchivement && (
         <>
-          <MusicWidget musicData={musicAchivement[0]} />
+          <MusicWidget musicData={JSON.parse(musicAchivement)} />
 
           <Divider sx={{ width: '100%' }} />
         </>
       )}
-
-      <LeftBarButtton title="Home" isActive={isHomePage} handleOnClick={() => navigate('/')}>
-        <Home color={isHomePage ? 'textPrimary' : 'black'} sx={{ fontSize: '1.5rem' }} />
-      </LeftBarButtton>
-
-      <LeftBarButtton title="Blog">
-        <ConnectWithoutContact
-          color={false ? 'textPrimary' : 'black'}
-          sx={{ fontSize: '1.5rem' }}
-        />
-      </LeftBarButtton>
-
       <LeftBarButtton
         title="Videos"
         isActive={isVideosPage}
@@ -76,7 +53,10 @@ function LeftBar() {
         isActive={isBattlesPage}
         handleOnClick={() => navigate('/battles')}
       >
-        <LiveTvOutlined color={false ? 'textPrimary' : 'black'} sx={{ fontSize: '1.5rem' }} />
+        <LiveTvOutlined
+          color={isBattlesPage ? 'textPrimary' : 'black'}
+          sx={{ fontSize: '1.5rem' }}
+        />
       </LeftBarButtton>
 
       <Divider sx={{ width: '100%' }} />

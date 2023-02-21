@@ -1,32 +1,9 @@
-import AgoraRTC from 'agora-rtc-sdk-ng'
 import {
   createBufferSourceAudioTrack,
   createClient,
   createMicrophoneAndCameraTracks
 } from 'agora-rtc-react'
 import { APP_ID } from './config'
-// import { RtcRole, RtcTokenBuilder } from 'agora-access-token'
-
-// export const handleGenerateNewChannelToken = (channelName, uid) => {
-//   const appId = process.env.AGORA_APP_ID
-//   const appCertificate = process.env.AGORA_APP_CERTIFICATE
-
-//   const expirationTimeInSeconds = 3600 * 24
-//   const currentTimestamp = Math.floor(Date.now() / 1000)
-//   const role = RtcRole.PUBLISHER
-//   const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-
-//   const token = RtcTokenBuilder.buildTokenWithUid(
-//     appId,
-//     appCertificate,
-//     channelName,
-//     role,
-//     uid,
-//     privilegeExpiredTs
-//   )
-
-//   return token
-// }
 
 export const useClient = createClient({ mode: 'rtc', codec: 'vp8' })
 
@@ -48,6 +25,49 @@ const handleCreateBufferSourceAudioTrack = client => {
   const recordEngine = createRecordingEngine()
 
   return { bufferSource }
+}
+
+export const useVideoCall = client => {
+  const initRoom = async (tracks, roomId, userId) => {
+    let remoteUser = null
+
+    client.on('user-published', async (user, mediaType) => {
+      await client.subscribe(user, mediaType)
+      if (mediaType === 'video') {
+        remoteUser = user
+      }
+      if (mediaType === 'audio') {
+        user.audioTrack.play()
+      }
+    })
+
+    client.on('user-unpublished', (user, mediaType) => {
+      if (mediaType === 'audio') {
+        if (user.audioTrack) user.audioTrack.stop()
+      }
+      if (mediaType === 'video') {
+        remoteUser = null
+      }
+    })
+
+    client.on('user-left', user => {
+      remoteUser = null
+    })
+
+    await client.join(APP_ID, roomId, null, userId)
+    if (tracks) await client.publish([tracks[0], tracks[1]])
+
+    return remoteUser
+  }
+
+  const leaveRoom = async tracks => {
+    await client.leave()
+    client.removeAllListeners()
+    tracks[0].close()
+    tracks[1].close()
+  }
+
+  return { initRoom, leaveRoom }
 }
 
 export const useAudioRecorder = handleCreateBufferSourceAudioTrack
