@@ -5,11 +5,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { FlexBetween, Loading } from '~/components'
 import useFirestore from '~/hooks/useFirestore'
-import { APP_ID } from '~/agora/config'
 import { useClient, useMicrophoneAndCameraTracks, useVideoCall } from '~/agora/rtc'
 import { AgoraVideoPlayer } from 'agora-rtc-react'
 import { toast } from 'react-toastify'
 import VideoCallControl from './VideoCallControl'
+
+const APP_ID = process.env.REACT_APP_AGORA_APP_ID
 
 export default function RoomChat() {
   const navigate = useNavigate()
@@ -32,7 +33,7 @@ export default function RoomChat() {
         if (mediaType === 'video') {
           setRemoteUser(user)
         }
-        if (mediaType === 'audiox') {
+        if (mediaType === 'audio') {
           user.audioTrack.play()
         }
       })
