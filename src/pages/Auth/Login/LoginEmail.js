@@ -49,7 +49,6 @@ export default function LoginEmail() {
       onSuccess={data => handleSubmit(data)}
       noValidate
     >
-      {console.log('==> re-render')}
       <TextFieldElement
         id="email"
         name="email"

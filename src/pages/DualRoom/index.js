@@ -18,7 +18,6 @@ import useFirestore from '~/hooks/useFirestore'
 import { useGetVideosQuery } from '../VideoDetail/videosSlice'
 import { toast } from 'react-toastify'
 import images from '~/assets/images'
-import { APP_ID } from '~/agora/config'
 import { deleteDocument, updateDocument } from '~/firebase/services'
 import { useReactMediaRecorder } from 'react-media-recorder'
 import useMergeFiles from '~/hooks/useMergeFiles'
@@ -27,6 +26,8 @@ import NextVideoSelect from './NextVideoSelect'
 import { ArrowBackOutlined } from '@mui/icons-material'
 import UserCamera from './UserCamera'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
+
+const APP_ID = process.env.REACT_APP_AGORA_APP_ID
 
 function DualRoom() {
   const navigate = useNavigate()
