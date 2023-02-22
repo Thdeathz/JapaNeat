@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { FlexBetween, Loading } from '~/components'
 import useFirestore from '~/hooks/useFirestore'
-import { useClient, useMicrophoneAndCameraTracks, useVideoCall } from '~/agora/rtc'
+import { useClient, useMicrophoneAndCameraTracks } from '~/agora/rtc'
 import { AgoraVideoPlayer } from 'agora-rtc-react'
 import { toast } from 'react-toastify'
 import VideoCallControl from './VideoCallControl'
@@ -33,7 +33,7 @@ export default function RoomChat() {
         if (mediaType === 'video') {
           setRemoteUser(user)
         }
-        if (mediaType === 'audio') {
+        if (mediaType === 'audiox') {
           user.audioTrack.play()
         }
       })
@@ -82,7 +82,7 @@ export default function RoomChat() {
         tracks[1].close()
       }
     }
-  }, [videoId, roomId, ready, tracks, roomData])
+  }, [videoId, roomId, tracks, roomData])
 
   return (
     <>
@@ -94,6 +94,7 @@ export default function RoomChat() {
           gap="1rem"
           className="bg-slate-800 w-screen h-screen overflow-hidden p-4"
         >
+          {console.log('===> Loading', tracks)}
           <Box className="basis-11/12 w-full" sx={{ borderRadius: '0.5rem' }}>
             <FlexBetween className="w-full h-full lg:flex-row flex-col" gap="1.5rem">
               <FlexBetween alignItems="center" className="basis-3/4 h-full ">
