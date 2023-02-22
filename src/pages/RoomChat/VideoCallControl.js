@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ReactMediaRecorder } from 'react-media-recorder'
 import { useDispatch } from 'react-redux'
-import { ButtonBase } from '@mui/material'
+import { ButtonBase, useMediaQuery } from '@mui/material'
 import { v4 } from 'uuid'
 import { addDocument } from '~/firebase/services'
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
@@ -35,6 +35,8 @@ function VideoCallControl({ client, tracks, videoData, roomData }) {
 
   const [addNewRecord] = useAddNewRecordMutation()
 
+  const isDesktopScreen = useMediaQuery('(min-width: 640px)')
+
   const handleOpenCamera = async () => {
     if (tracks.length !== 0) {
       console.log('=======> Tracks', tracks)
@@ -65,35 +67,37 @@ function VideoCallControl({ client, tracks, videoData, roomData }) {
   }
 
   const handleUpload = async mediaBlobUrl => {
-    setLoading(true)
-    const blob = await fetch(mediaBlobUrl).then(r => r.blob())
-    if (blob) {
-      const file = new File([blob], String(v4()), { type: 'audio/wav' })
-      if (file) {
-        const path = await uploadFile(file)
-        if (path) {
-          try {
-            const res = await addNewRecord({
-              url: path,
-              thumbnail: videoData.video.thumbnail,
-              offer_id: roomData.offerId,
-              answer_id: roomData.answerId,
-              video_detail_id: videoData.id
-            }).unwrap()
+    if (isDesktopScreen) {
+      setLoading(true)
+      const blob = await fetch(mediaBlobUrl).then(r => r.blob())
+      if (blob) {
+        const file = new File([blob], String(v4()), { type: 'audio/wav' })
+        if (file) {
+          const path = await uploadFile(file)
+          if (path) {
+            try {
+              const res = await addNewRecord({
+                url: path,
+                thumbnail: videoData.video.thumbnail,
+                offer_id: roomData.offerId,
+                answer_id: roomData.answerId,
+                video_detail_id: videoData.id
+              }).unwrap()
 
-            await addDocument({
-              collectionName: 'notifications',
-              data: {
-                teacherId: videoData.teacher.id,
-                recordId: res.ids[0],
-                message: `${roomData.offerDisplayName} need your feedback !!!`
-              }
-            })
+              await addDocument({
+                collectionName: 'notifications',
+                data: {
+                  teacherId: videoData.teacher.id,
+                  recordId: res.ids[0],
+                  message: `${roomData.offerDisplayName} need your feedback !!!`
+                }
+              })
 
-            handleLeaveRoom()
-            setLoading(false)
-          } catch (error) {
-            console.log(error)
+              handleLeaveRoom()
+              setLoading(false)
+            } catch (error) {
+              console.log(error)
+            }
           }
         }
       }
@@ -139,42 +143,44 @@ function VideoCallControl({ client, tracks, videoData, roomData }) {
           )}
         </ButtonBase>
 
-        <ReactMediaRecorder
-          screen
-          render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
-            <>
-              <ButtonBase
-                sx={{
-                  backgroundColor: 'rgba(71, 85, 105, 1)',
-                  p: '0.5rem',
-                  borderRadius: '50%',
-                  '&:hover': {
-                    backgroundColor: 'rgba(71, 85, 105, 0.5)'
+        {isDesktopScreen && (
+          <ReactMediaRecorder
+            screen
+            render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
+              <>
+                <ButtonBase
+                  sx={{
+                    backgroundColor: 'rgba(71, 85, 105, 1)',
+                    p: '0.5rem',
+                    borderRadius: '50%',
+                    '&:hover': {
+                      backgroundColor: 'rgba(71, 85, 105, 0.5)'
+                    }
+                  }}
+                  onClick={() =>
+                    status === 'idle'
+                      ? startRecording()
+                      : status === 'recording'
+                      ? stopRecording()
+                      : handleUpload(mediaBlobUrl)
                   }
-                }}
-                onClick={() =>
-                  status === 'idle'
-                    ? startRecording()
-                    : status === 'recording'
-                    ? stopRecording()
-                    : handleUpload(mediaBlobUrl)
-                }
-              >
-                {status === 'idle' && <FiberManualRecordOutlined sx={{ color: 'white' }} />}
-                {status === 'recording' && <RadioButtonCheckedIcon sx={{ color: 'red' }} />}
-                {status === 'stopped' && (
-                  <>
-                    {loading ? (
-                      <CircularProgress color="textDefault" size={22} />
-                    ) : (
-                      <UploadFileIcon sx={{ color: 'white' }} />
-                    )}
-                  </>
-                )}
-              </ButtonBase>
-            </>
-          )}
-        />
+                >
+                  {status === 'idle' && <FiberManualRecordOutlined sx={{ color: 'white' }} />}
+                  {status === 'recording' && <RadioButtonCheckedIcon sx={{ color: 'red' }} />}
+                  {status === 'stopped' && (
+                    <>
+                      {loading ? (
+                        <CircularProgress color="textDefault" size={22} />
+                      ) : (
+                        <UploadFileIcon sx={{ color: 'white' }} />
+                      )}
+                    </>
+                  )}
+                </ButtonBase>
+              </>
+            )}
+          />
+        )}
 
         <ButtonBase
           sx={{

@@ -1,4 +1,4 @@
-import {
+import AgoraRTC, {
   createBufferSourceAudioTrack,
   createClient,
   createMicrophoneAndCameraTracks

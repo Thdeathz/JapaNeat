@@ -167,7 +167,7 @@ function DualRoom() {
         await client.subscribe(user, mediaType)
 
         if (mediaType === 'video') {
-          if (tracks) {
+          if (isOfferUser || isAnswerUser) {
             if (user.uid == offerId || user.uid == answerId) setAnswerUser(user)
           } else {
             if (user.uid == offerId) setOfferUser(user)
