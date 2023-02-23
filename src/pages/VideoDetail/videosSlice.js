@@ -9,7 +9,9 @@ import { addDocument, deleteDocument } from '~/firebase/services'
 
 const videosAdapter = createEntityAdapter({})
 
-const initialState = videosAdapter.getInitialState()
+const initialState = videosAdapter.getInitialState({
+  filterCategory: 'All'
+})
 
 export const videosApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -22,6 +24,10 @@ export const videosApiSlice = apiSlice.injectEndpoints({
         { type: 'Video', id: 'List' },
         ...result.ids.map(id => ({ type: 'Video', id }))
       ]
+    }),
+    getCategories: builder.query({
+      query: () => '/categories',
+      providesTags: () => [{ type: 'Video', id: 'Categories' }]
     })
   })
 })
@@ -77,10 +83,14 @@ export const deleteFromWatchinglist = createAsyncThunk(
 const videosSlice = createSlice({
   name: 'videos',
   initialState,
-  reducers: {}
+  reducers: {
+    filterVideosByCategory: (state, action) => {
+      state.filterCategory = action.payload
+    }
+  }
 })
 
-export const { useGetVideosQuery } = videosApiSlice
+export const { useGetVideosQuery, useGetCategoriesQuery } = videosApiSlice
 
 export const selectVideoResult = videosApiSlice.endpoints.getVideos.select()
 
@@ -91,5 +101,17 @@ export const {
   selectById: selectVideoById,
   selectIds: selectVideoIds
 } = videosAdapter.getSelectors(state => selectVideosData(state) ?? initialState)
+
+export const selectVideosByCategory = createSelector(
+  [selectAllVideos, (state, filterValue) => filterValue],
+  (videos, filterValue) => {
+    if (filterValue === 'All') return videos
+    return videos.filter(video => video.category === filterValue)
+  }
+)
+
+export const getCurrentCategoryState = state => state.videos.filterCategory
+
+export const { filterVideosByCategory } = videosSlice.actions
 
 export default videosSlice.reducer

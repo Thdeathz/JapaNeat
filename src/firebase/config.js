@@ -30,5 +30,5 @@ export const db = getFirestore(app)
 export const storage = getStorage(app)
 
 // development environment only
-// connectFirestoreEmulator(db, 'localhost', 8080)
+// connectFirestoreEmulator(db, 'localhost', 8081)
 // connectStorageEmulator(storage, 'localhost', 4040)

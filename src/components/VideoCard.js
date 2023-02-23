@@ -36,7 +36,15 @@ function VideoCard({ videoId }) {
         )}
         <CardContent>
           <Box className="flex flex-row justify-between items-center pb-2">
-            <Typography variant="h5" component="p" sx={{ fontWeight: '500' }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: '500',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}
+            >
               {video.title}
             </Typography>
             <Typography component="p">23m views</Typography>
