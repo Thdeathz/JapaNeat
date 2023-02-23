@@ -16,7 +16,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Box className="h-screen w-screen" sx={style && JSON.parse(style)}>
+      <Box className="min-h-screen w-screen" sx={style && JSON.parse(style)}>
         <ToastContainer autoClose={2000} style={{ fontSize: '16px' }} />
         <Routes>
           <Route element={<LoggedIn />}>

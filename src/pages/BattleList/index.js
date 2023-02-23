@@ -18,7 +18,7 @@ function BattleList() {
       ) : (
         <>
           {roomData.length === 0 ? (
-            <NoData />
+            <NoData title={`No battle available now :((`} />
           ) : (
             <Box className="flex flex-col justify-center items-start px-2 pb-4">
               <Grid className="lg:gap-4 gap-2" container>

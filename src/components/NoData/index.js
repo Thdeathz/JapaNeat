@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
 import {
   downAnimation,
   fallAnimation,
@@ -10,7 +11,7 @@ import {
 import { gsap } from 'gsap'
 import './NoData.scss'
 
-export default function NoData() {
+function NoData({ title }) {
   const loadingRef = useRef(null)
 
   useEffect(() => {
@@ -109,7 +110,13 @@ export default function NoData() {
           <div className="line bottom"></div>
         </div>
       </div>
-      <div className="description">{`No battle available now :((`}</div>
+      <div className="description">{title}</div>
     </div>
   )
 }
+
+NoData.propTypes = {
+  title: PropTypes.string.isRequired
+}
+
+export default NoData
